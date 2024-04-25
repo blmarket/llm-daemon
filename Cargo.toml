@@ -1,0 +1,11 @@
+[workspace]
+resolver = "2"
+members = [ "llm-daemon", "bihyung", ]
+default-members = [ "llm-daemon" ]
+
+[workspace.dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["full"] }
+anyhow = "1"
+tracing = "0.1"

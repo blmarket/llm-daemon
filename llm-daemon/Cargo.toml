@@ -1,0 +1,34 @@
+[package]
+name = "llm-daemon"
+version = "0.0.1"
+edition = "2021"
+license = "GPL-3.0-only"
+keywords = ["llm"]
+
+[dependencies]
+tracing = { workspace = true }
+anyhow = { workspace = true }
+tokio = { workspace = true }
+axum = "0.7"
+daemonize = "0.5"
+serde = { workspace = true }
+serde_json = { workspace = true }
+futures = "0.3"
+hyper = { version = "1", features = ["full"] }
+hyper-util = { version = "0.1", features = ["full"] }
+reqwest = { version = "0.12", features = ["json"] }
+tempfile = "3"
+url = "2"
+
+[dev-dependencies]
+tracing-test = "0.2"
+criterion = "0.5"
+
+[features]
+default = ["llama-daemon", "mlc-daemon"]
+llama-daemon = []
+mlc-daemon = []
+
+[[bench]]
+name = "port_open"
+harness = false    

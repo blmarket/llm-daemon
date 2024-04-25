@@ -1,0 +1,19 @@
+[package]
+name = "bihyung"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+name = "bihyung"
+crate-type = ["cdylib"]
+
+[dependencies]
+llm-daemon = { path = "../llm-daemon" }
+pyo3 = "0.20.0"
+pyo3-asyncio = { version = "0.20", features = ["tokio-runtime"] }
+tokio = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = "0.3"
+enum_dispatch = "0.3"
+url = "2"
