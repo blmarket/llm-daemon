@@ -29,15 +29,19 @@ pub struct LlamaConfig {
 
 impl LlmConfig for LlamaConfig {
     fn endpoint(&self) -> url::Url {
-        url::Url::parse(&format!("http://127.0.0.1:{}/v1/completions", self.port))
-            .expect("failed to parse url")
+        url::Url::parse(&format!(
+            "http://127.0.0.1:{}/v1/completions",
+            self.port
+        ))
+        .expect("failed to parse url")
     }
 }
 
 impl Default for LlamaConfig {
     fn default() -> Self {
         Self {
-            server_path: PathBuf::from(env!("HOME")).join("proj/llama.cpp/build/bin/server"),
+            server_path: PathBuf::from(env!("HOME"))
+                .join("proj/llama.cpp/build/bin/server"),
             model_path: PathBuf::from(env!("HOME"))
                 .join("proj/Meta-Llama-3-8B-Instruct-Q5_K_M.gguf"),
             pid_file: PathBuf::from("/tmp/llama-daemon.pid"),
@@ -87,7 +91,10 @@ impl LlmDaemon for Daemon2 {
         match daemon.execute() {
             daemonize::Outcome::Child(res) => {
                 if res.is_err() {
-                    eprintln!("Maybe another daemon is already running: {:?}", res.err());
+                    eprintln!(
+                        "Maybe another daemon is already running: {:?}",
+                        res.err()
+                    );
                     exit(0)
                 }
                 let runtime = RuntimeBuilder::new_current_thread()
@@ -151,17 +158,18 @@ impl LlmDaemon for Daemon2 {
                 std::fs::remove_file(&self.config.sock_file).ok();
                 info!("Server closed");
                 exit(0)
-            }
+            },
             daemonize::Outcome::Parent(res) => {
                 res.expect("parent should have no problem");
-            }
+            },
         };
         Ok(())
     }
 
     fn heartbeat(
         &self,
-    ) -> impl futures::prelude::Future<Output = anyhow::Result<()>> + Send + 'static {
+    ) -> impl futures::prelude::Future<Output = anyhow::Result<()>> + Send + 'static
+    {
         let sock_file = self.config.sock_file.clone();
         async move {
             loop {
@@ -169,10 +177,10 @@ impl LlmDaemon for Daemon2 {
                 let stream = UnixStream::connect(&sock_file).await?;
                 stream.writable().await?;
                 match stream.try_write(&[0]) {
-                    Ok(_) => {}
+                    Ok(_) => {},
                     Err(err) => {
                         panic!("something wrong: {}", err);
-                    }
+                    },
                 };
                 tokio::time::sleep(Duration::from_secs(1)).await;
             }

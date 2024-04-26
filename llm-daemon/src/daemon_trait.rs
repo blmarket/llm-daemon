@@ -20,5 +20,7 @@ pub trait LlmDaemon {
     /// Daemon is expected to terminate if there's no heartbeat for a certain period of time.
     /// Keeping this task within async runtime will ensure that the daemon is kept running
     /// during the application.
-    fn heartbeat(&self) -> impl Future<Output = anyhow::Result<()>> + Send + 'static;
+    fn heartbeat(
+        &self,
+    ) -> impl Future<Output = anyhow::Result<()>> + Send + 'static;
 }

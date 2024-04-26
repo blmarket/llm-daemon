@@ -1,5 +1,4 @@
-use std::fs::File;
-use std::fs::Permissions;
+use std::fs::{File, Permissions};
 use std::io::Write as _;
 use std::os::unix::fs::PermissionsExt as _;
 use std::path::PathBuf;
@@ -10,8 +9,7 @@ use daemonize::{Daemonize, Stdio};
 use futures::Future;
 use tempfile::TempDir;
 use tokio::io::AsyncWriteExt as _;
-use tokio::net::UnixListener;
-use tokio::net::UnixStream;
+use tokio::net::{UnixListener, UnixStream};
 use tokio::process::Command;
 use tokio::runtime::Builder as RuntimeBuilder;
 use tokio::select;
@@ -20,8 +18,7 @@ use tracing::{info, trace, warn};
 use url::Url;
 
 use crate::daemon_trait::LlmConfig;
-use crate::mlc_daemon::bootstrap::PYPROJECT;
-use crate::mlc_daemon::bootstrap::SCRIPT;
+use crate::mlc_daemon::bootstrap::{PYPROJECT, SCRIPT};
 use crate::LlmDaemon;
 
 pub struct DaemonConfig {
@@ -77,7 +74,8 @@ impl LlmDaemon for Daemon {
     fn fork_daemon(&self) -> anyhow::Result<()> {
         let config = &self.config;
         let port_str = config.port.to_string();
-        let args: Vec<&str> = vec![&config.model, "--host", &config.host, "--port", &port_str];
+        let args: Vec<&str> =
+            vec![&config.model, "--host", &config.host, "--port", &port_str];
 
         let stdout: Stdio = File::create(&config.stdout)
             .map(|v| v.into())
@@ -104,7 +102,8 @@ impl LlmDaemon for Daemon {
                     exit(0)
                 }
                 let _ = std::io::stdout().write_all(
-                    format!("Daemon spawned: {:?}\n", std::env::current_dir()).as_bytes(),
+                    format!("Daemon spawned: {:?}\n", std::env::current_dir())
+                        .as_bytes(),
                 );
                 let runtime = RuntimeBuilder::new_current_thread()
                     .enable_time()
@@ -194,17 +193,20 @@ impl LlmDaemon for Daemon {
                     drop(temp_dir);
                 });
                 std::fs::remove_file(&config.sock_file).ok();
-                let _ = std::io::stdout().write_all(format!("Server closed\n").as_bytes());
+                let _ = std::io::stdout()
+                    .write_all(format!("Server closed\n").as_bytes());
                 exit(0)
-            }
+            },
             daemonize::Outcome::Parent(res) => {
                 res.expect("parent should have no problem");
-            }
+            },
         }
         Ok(())
     }
 
-    fn heartbeat(&self) -> impl Future<Output = anyhow::Result<()>> + Send + 'static {
+    fn heartbeat(
+        &self,
+    ) -> impl Future<Output = anyhow::Result<()>> + Send + 'static {
         let sock_file = self.config.sock_file.clone();
         async move {
             loop {
@@ -222,10 +224,10 @@ impl LlmDaemon for Daemon {
                 match stream.try_write(&[0]) {
                     Ok(_) => {
                         info!("sent heartbeat");
-                    }
+                    },
                     Err(err) => {
                         warn!("Cannot send heartbeat: {:?}", err);
-                    }
+                    },
                 };
             }
         }
@@ -234,12 +236,13 @@ impl LlmDaemon for Daemon {
 
 #[cfg(test)]
 mod tests {
-    use tokio::runtime::{Builder as RuntimeBuilder, Runtime};
+    use tokio::runtime::Builder as RuntimeBuilder;
     use tracing_test::traced_test;
 
-    use crate::{daemon_trait::LlmConfig as _, test_client::Generator, LlmDaemon as _};
-
     use super::{Daemon, DaemonConfig};
+    use crate::daemon_trait::LlmConfig as _;
+    use crate::test_client::Generator;
+    use crate::LlmDaemon as _;
 
     #[traced_test]
     #[test]

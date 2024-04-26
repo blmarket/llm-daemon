@@ -1,6 +1,8 @@
 #![allow(non_local_definitions)]
 
-use llm_daemon::{self, LlamaConfig, LlmConfig as _, LlmDaemon as _, MlcConfig, ProxyConfig};
+use llm_daemon::{
+    self, LlamaConfig, LlmConfig as _, LlmDaemon as _, MlcConfig, ProxyConfig,
+};
 use pyo3::prelude::*;
 use pyo3_asyncio::tokio::get_runtime;
 use tracing::info;
@@ -22,7 +24,11 @@ impl Generator {
         }
     }
 
-    pub fn generate<'a>(&'a self, py: Python<'a>, prompt: String) -> PyResult<&PyAny> {
+    pub fn generate<'a>(
+        &'a self,
+        py: Python<'a>,
+        prompt: String,
+    ) -> PyResult<&PyAny> {
         let fut = self.inner.generate(prompt);
         pyo3_asyncio::tokio::future_into_py(py, async move {
             let tmp = fut.await;
@@ -117,8 +123,10 @@ impl ProxyDaemon {
     pub fn new() -> Self {
         let conf = ProxyConfig::default();
         let endpoint = conf.endpoint();
-        let inner =
-            llm_daemon::Proxy::new(conf, llm_daemon::LlamaDaemon::new(LlamaConfig::default()));
+        let inner = llm_daemon::Proxy::new(
+            conf,
+            llm_daemon::LlamaDaemon::new(LlamaConfig::default()),
+        );
 
         Self {
             endpoint: endpoint.to_string(),
@@ -153,7 +161,8 @@ fn bihyung(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
         // builds the subscriber.
         .finish();
 
-    tracing::subscriber::set_global_default(subscriber).expect("failed to config logging");
+    tracing::subscriber::set_global_default(subscriber)
+        .expect("failed to config logging");
     info!("This will be logged to stdout");
     m.add_class::<Generator>()?;
     m.add_class::<LlamaDaemon>()?;

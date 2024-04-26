@@ -2,7 +2,8 @@ use std::time::{Duration, Instant};
 
 use criterion::{criterion_group, criterion_main, Criterion};
 use llm_daemon::{
-    LlamaConfig, LlamaDaemon, LlmConfig as _, LlmDaemon, MlcConfig, MlcDaemon, Proxy, ProxyConfig,
+    LlamaConfig, LlamaDaemon, LlmConfig as _, LlmDaemon, MlcConfig, MlcDaemon,
+    Proxy, ProxyConfig,
 };
 use tokio::runtime::Builder as RuntimeBuilder;
 use url::Url;
@@ -31,7 +32,9 @@ fn proxy_config() -> (Url, impl LlmDaemon) {
     (endpoint, daemon)
 }
 
-fn time_to_port_open<T: LlmDaemon>(conf: impl Fn() -> (Url, T)) -> anyhow::Result<()> {
+fn time_to_port_open<T: LlmDaemon>(
+    conf: impl Fn() -> (Url, T),
+) -> anyhow::Result<()> {
     let (endpoint, daemon) = conf();
 
     daemon.fork_daemon()?;

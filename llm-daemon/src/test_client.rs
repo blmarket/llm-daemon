@@ -1,4 +1,5 @@
-use std::{sync::Arc, time::Duration};
+use std::sync::Arc;
+use std::time::Duration;
 
 use futures::{Future, FutureExt as _};
 use reqwest::Client;
@@ -39,7 +40,9 @@ impl Generator {
     pub fn new(endpoint: Url, model: Option<String>) -> Self {
         Generator {
             endpoint,
-            model: model.unwrap_or_else(|| "HF://mlc-ai/gemma-2b-it-q4f16_1-MLC".to_string()),
+            model: model.unwrap_or_else(|| {
+                "HF://mlc-ai/gemma-2b-it-q4f16_1-MLC".to_string()
+            }),
             client: Arc::new(Client::new()),
         }
     }
@@ -63,18 +66,15 @@ impl Generator {
             "stop": stop,
         });
 
-        let res = client
-            .post(endpoint)
-            .json(&payload)
-            .send()
-            .await
-            .map_err(|err| {
+        let res = client.post(endpoint).json(&payload).send().await.map_err(
+            |err| {
                 if err.is_connect() {
                     debug!("got connect error, better retry");
                     return true;
                 }
                 false
-            })?;
+            },
+        )?;
 
         if res.status() == 503 {
             debug!("got 503 error, better retry");
@@ -99,12 +99,16 @@ impl Generator {
                 Err(err) => {
                     if err {
                         info!("Retryable error, retry in 1000ms");
-                        let _ = tokio::time::sleep(Duration::from_millis(1000)).await;
+                        let _ = tokio::time::sleep(Duration::from_millis(1000))
+                            .await;
                     } else {
-                        warn!(err = format!("{:?}", err), "unknown error querying daemon");
+                        warn!(
+                            err = format!("{:?}", err),
+                            "unknown error querying daemon"
+                        );
                         anyhow::bail!(err)
                     }
-                }
+                },
             };
             cnt -= 1;
             if cnt == 0 {
@@ -131,7 +135,9 @@ impl Generator {
             )
         })
         .map(|json| match serde_json::from_str(&json?)? {
-            LlmResponse::OpenAI(choices) => Ok(choices.choices.first().unwrap().text.clone()),
+            LlmResponse::OpenAI(choices) => {
+                Ok(choices.choices.first().unwrap().text.clone())
+            },
             LlmResponse::LlamaCpp(completion) => Ok(completion.content),
         })
     }

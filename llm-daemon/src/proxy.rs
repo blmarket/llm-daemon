@@ -1,20 +1,25 @@
 use std::sync::Arc;
 
-use axum::{
-    body::BodyDataStream, extract::State, http::HeaderValue, response::IntoResponse, routing::post,
-    Router,
-};
-use hyper::{body::Incoming, Response, StatusCode};
-use hyper_util::{
-    client::legacy::{connect::HttpConnector, Client},
-    rt::TokioExecutor,
-};
+use axum::body::BodyDataStream;
+use axum::extract::State;
+use axum::http::HeaderValue;
+use axum::response::IntoResponse;
+use axum::routing::post;
+use axum::Router;
+use hyper::body::Incoming;
+use hyper::{Response, StatusCode};
+use hyper_util::client::legacy::connect::HttpConnector;
+use hyper_util::client::legacy::Client;
+use hyper_util::rt::TokioExecutor;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use tokio::{net::TcpListener, sync::Semaphore, time::Instant};
+use tokio::net::TcpListener;
+use tokio::sync::Semaphore;
+use tokio::time::Instant;
 use tracing::{debug, warn};
 
-use crate::{daemon_trait::LlmConfig, LlmDaemon};
+use crate::daemon_trait::LlmConfig;
+use crate::LlmDaemon;
 
 pub struct ProxyConfig {
     port: u16,
@@ -22,8 +27,11 @@ pub struct ProxyConfig {
 
 impl LlmConfig for ProxyConfig {
     fn endpoint(&self) -> url::Url {
-        url::Url::parse(&format!("http://127.0.0.1:{}/v1/completions", self.port))
-            .expect("failed to parse url")
+        url::Url::parse(&format!(
+            "http://127.0.0.1:{}/v1/completions",
+            self.port
+        ))
+        .expect("failed to parse url")
     }
 }
 
@@ -58,7 +66,8 @@ impl<D: LlmDaemon> LlmDaemon for Proxy<D> {
 
     fn heartbeat(
         &self,
-    ) -> impl futures::prelude::Future<Output = anyhow::Result<()>> + Send + 'static {
+    ) -> impl futures::prelude::Future<Output = anyhow::Result<()>> + Send + 'static
+    {
         let port = self.config.port;
         let hb = self.inner.heartbeat();
         async move {
@@ -91,7 +100,10 @@ async fn inner(
 }
 
 async fn handle_proxy(
-    State((sem, client)): State<(Arc<Semaphore>, Client<HttpConnector, BodyDataStream>)>,
+    State((sem, client)): State<(
+        Arc<Semaphore>,
+        Client<HttpConnector, BodyDataStream>,
+    )>,
     req: axum::extract::Request,
 ) -> Result<impl IntoResponse, StatusCode> {
     let clock = Instant::now();
@@ -130,7 +142,9 @@ async fn handle_proxy(
 }
 
 pub async fn run_proxy(port: u16) -> anyhow::Result<()> {
-    let client = hyper_util::client::legacy::Client::builder(TokioExecutor::new()).build_http();
+    let client =
+        hyper_util::client::legacy::Client::builder(TokioExecutor::new())
+            .build_http();
     let app = Router::new()
         .route("/completions", post(handle_proxy))
         .route("/v1/completions", post(handle_proxy))
@@ -144,16 +158,18 @@ pub async fn run_proxy(port: u16) -> anyhow::Result<()> {
 
 #[cfg(test)]
 mod tests {
-    use std::{sync::Arc, time::Duration};
+    use std::sync::Arc;
+    use std::time::Duration;
 
     use futures::future;
-    use tokio::{runtime::Runtime, sync::Mutex};
+    use tokio::runtime::Runtime;
+    use tokio::sync::Mutex;
     use tracing::error;
     use tracing_test::traced_test;
 
-    use crate::{
-        daemon_trait::LlmConfig as _, proxy::Proxy, Generator, LlamaConfig, LlamaDaemon, LlmDaemon,
-    };
+    use crate::daemon_trait::LlmConfig as _;
+    use crate::proxy::Proxy;
+    use crate::{Generator, LlamaConfig, LlamaDaemon, LlmDaemon};
 
     #[traced_test]
     #[test]

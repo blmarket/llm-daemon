@@ -7,9 +7,9 @@ mod tests {
     use tokio::runtime::Builder as RuntimeBuilder;
     use tracing_test::traced_test;
 
-    use crate::{daemon_trait::LlmConfig as _, Generator, LlmDaemon as _};
-
     use super::{Daemon2 as Daemon, LlamaConfig};
+    use crate::daemon_trait::LlmConfig as _;
+    use crate::{Generator, LlmDaemon as _};
 
     #[traced_test]
     #[test]
