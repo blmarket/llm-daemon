@@ -115,10 +115,6 @@ impl LlmDaemon for Daemon2 {
                         signal(SignalKind::terminate()).expect("failed to add SIGTERM handler");
                     loop {
                         select! {
-                           _ = tokio::time::sleep(Duration::from_secs(10)) => {
-                               info!("no activity for 10 seconds, closing...");
-                               break;
-                           },
                            _ = sigterms.recv() => {
                                info!("Got SIGTERM, closing");
                                break;
@@ -126,7 +122,7 @@ impl LlmDaemon for Daemon2 {
                            exit_status = cmd.wait() => {
                                error!("Child process got closed: {:?}", exit_status);
                                break;
-                           }
+                           },
                            res = listener.accept() => {
                                let (mut stream, _) = res.expect("failed to create socket");
                                let mut buf = [0u8; 32];
@@ -142,7 +138,11 @@ impl LlmDaemon for Daemon2 {
                                     }
                                }
                                stream.shutdown().await.expect("failed to close socket");
-                           }
+                           },
+                           _ = tokio::time::sleep(Duration::from_secs(10)) => {
+                               info!("no activity for 10 seconds, closing...");
+                               break;
+                           },
                         }
                     }
                     // Child might be already killed, so ignore the error
@@ -166,7 +166,7 @@ impl LlmDaemon for Daemon2 {
         async move {
             loop {
                 trace!("Running scheduled loop");
-                let stream = UnixStream::connect(sock_file.clone()).await?;
+                let stream = UnixStream::connect(&sock_file).await?;
                 stream.writable().await?;
                 match stream.try_write(&[0]) {
                     Ok(_) => {}
@@ -174,7 +174,7 @@ impl LlmDaemon for Daemon2 {
                         panic!("something wrong: {}", err);
                     }
                 };
-                tokio::time::sleep(Duration::from_secs(5)).await;
+                tokio::time::sleep(Duration::from_secs(1)).await;
             }
         }
     }

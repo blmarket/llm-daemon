@@ -2,12 +2,13 @@ use std::fs::File;
 use std::fs::Permissions;
 use std::io::Write as _;
 use std::os::unix::fs::PermissionsExt as _;
+use std::path::PathBuf;
 use std::process::exit;
 use std::time::Duration;
 
 use daemonize::{Daemonize, Stdio};
 use futures::Future;
-use tokio::fs;
+use tempfile::TempDir;
 use tokio::io::AsyncWriteExt as _;
 use tokio::net::UnixListener;
 use tokio::net::UnixStream;
@@ -15,8 +16,7 @@ use tokio::process::Command;
 use tokio::runtime::Builder as RuntimeBuilder;
 use tokio::select;
 use tokio::signal::unix::{signal, SignalKind};
-use tracing::trace;
-use tracing::warn;
+use tracing::{info, trace, warn};
 use url::Url;
 
 use crate::daemon_trait::LlmConfig;
@@ -100,79 +100,101 @@ impl LlmDaemon for Daemon {
         match daemon.execute() {
             daemonize::Outcome::Child(res) => {
                 if res.is_err() {
-                    eprintln!("Maybe another daemon is already running: {:?}", res.err());
+                    let _ = std::io::stdout().write_all(format!("Failed to spawn a daemon - maybe another daemon is already running?: {:?}\n", res.err()).as_bytes());
                     exit(0)
                 }
+                let _ = std::io::stdout().write_all(
+                    format!("Daemon spawned: {:?}\n", std::env::current_dir()).as_bytes(),
+                );
                 let runtime = RuntimeBuilder::new_current_thread()
                     .enable_time()
                     .enable_io()
                     .build()
                     .expect("failed to create runtime");
                 runtime.block_on(async {
-                    let temp_dir = tempfile::tempdir().unwrap();
-                    let file1_path = temp_dir.path().join("pyproject.toml");
-                    let mut file1 = File::create(file1_path).unwrap();
-                    file1.write_all(PYPROJECT.as_bytes()).unwrap();
-                    drop(file1);
-                    let file2_path = temp_dir.path().join("script.sh");
-                    let mut file2 = File::create(file2_path.clone()).unwrap();
-                    file2.write_all(SCRIPT.as_bytes()).unwrap();
-                    drop(file2);
-                    fs::set_permissions(file2_path.clone(), Permissions::from_mode(0o755))
-                        .await
-                        .expect("failed to set permissions");
+                    let bootstrap: anyhow::Result<(TempDir, PathBuf)> = (|| {
+                        let temp_dir = tempfile::tempdir()?;
+                        let _ = std::io::stdout().write_all(format!("temp dir: {:?}\n", temp_dir.path()).as_bytes());
+                        let file1_path = temp_dir.path().join("pyproject.toml");
+                        let mut file1 = File::create(file1_path)?;
+                        file1.write_all(PYPROJECT.as_bytes())?;
+                        file1.sync_all()?;
+                        let file2_path = temp_dir.path().join("script.sh");
+                        let mut file2 = File::create(file2_path.clone())?;
+                        file2.write_all(SCRIPT.as_bytes())?;
+                        file2.sync_all()?;
+                        std::fs::set_permissions(file2_path.clone(), Permissions::from_mode(0o755))?;
+                        Ok((temp_dir, file2_path))
+                    })();
+
+                    let Ok((temp_dir, file2_path)) = bootstrap else {
+                        let _ = std::io::stdout().write_all(format!("failed to bootstrap: {:?}\n", bootstrap.err()).as_bytes());
+                        panic!("what should I do");
+                    };
                     let mut cmd = Command::new(file2_path)
+                        .stdout(std::process::Stdio::inherit())
+                        .stderr(std::process::Stdio::inherit())
                         .current_dir(temp_dir.path())
                         .args(args)
                         .spawn()
                         .expect("failed to spawn child");
 
-                    eprintln!("child {:?}", cmd.id());
+                    let _ = std::io::stdout().write_all(format!("child: {:?}\n", cmd.id()).as_bytes());
 
                     let listener =
                         UnixListener::bind(&config.sock_file).expect("Failed to open socket");
                     let mut sigterms =
                         signal(SignalKind::terminate()).expect("failed to add SIGTERM handler");
+                    let _ = std::io::stdout().write_all(format!("Starting loop\n").as_bytes());
+                    let _ = std::io::stdout().flush();
                     loop {
                         select! {
-                           _ = tokio::time::sleep(Duration::from_secs(10)) => {
-                               eprintln!("no activity for 10 seconds, closing...");
-                               break;
-                           },
                            _ = sigterms.recv() => {
-                               eprintln!("Got SIGTERM, closing");
+                               let _ = std::io::stdout().write_all(format!("Got SIGTERM, closing\n").as_bytes());
                                break;
                            },
                            exit_status = cmd.wait() => {
-                               eprintln!("Child process got closed: {:?}", exit_status);
+                               let _ = std::io::stdout().write_all(format!("Child got closed: {:?}\n", exit_status).as_bytes());
                                break;
-                           }
+                           },
                            res = listener.accept() => {
-                               let (mut stream, _) = res.expect("failed to create socket");
+                               let Ok((mut stream, _)) = res else {
+                                   let _ = std::io::stdout().write_all(format!("Failed to accept a socket, closing\n").as_bytes());
+                                   break;
+                               };
                                let mut buf = [0u8; 32];
                                loop {
-                                   stream.readable().await.expect("failed to read");
+                                   let _ = stream.readable().await;
                                    match stream.try_read(&mut buf) {
-                                        Ok(_) => {
-                                            eprintln!("Got something, continuing...");
-                                        }
-                                        Err(_) => {
+                                        Ok(sz) => {
+                                            let _ = std::io::stdout().write_all(format!("Got {:?}, continue...\n", sz).as_bytes());
                                             break;
                                         },
+                                        Err(ref e) if e.kind() == std::io::ErrorKind::WouldBlock => {
+                                            continue;
+                                        },
+                                        Err(err) => {
+                                            let _ = std::io::stdout().write_all(format!("Error {:?}, exiting...\n", err).as_bytes());
+                                            break;
+                                        }
                                     }
                                }
-                               stream.shutdown().await.expect("failed to close socket");
-                           }
+                               let _ = stream.shutdown().await;
+                           },
+                           _ = tokio::time::sleep(Duration::from_secs(2)) => {
+                               let _ = std::io::stdout().write_all(format!("No activitiy for 10 seconds, closing...\n").as_bytes());
+                               break;
+                           },
                         }
                     }
                     // Child might be already killed, so ignore the error
-                    eprintln!("killing child {:?}", cmd.id());
+                    let _ = std::io::stdout().write_all(format!("Closing child: {:?}\n", cmd.id()).as_bytes());
                     cmd.kill().await.ok();
                     // To make sure temp_dir is alive until here
                     drop(temp_dir);
                 });
                 std::fs::remove_file(&config.sock_file).ok();
-                eprintln!("Server closed");
+                let _ = std::io::stdout().write_all(format!("Server closed\n").as_bytes());
                 exit(0)
             }
             daemonize::Outcome::Parent(res) => {
@@ -186,16 +208,25 @@ impl LlmDaemon for Daemon {
         let sock_file = self.config.sock_file.clone();
         async move {
             loop {
-                trace!("Running scheduled loop");
+                tokio::time::sleep(Duration::from_secs(1)).await;
+                trace!(sock_file = &sock_file, "Running scheduled loop");
+                if std::fs::metadata(&sock_file).is_err() {
+                    trace!(
+                        sock_file = &sock_file,
+                        "Cannot get file metadata, retry later"
+                    );
+                    continue;
+                }
                 let stream = UnixStream::connect(&sock_file).await?;
                 stream.writable().await?;
                 match stream.try_write(&[0]) {
-                    Ok(_) => {}
+                    Ok(_) => {
+                        info!("sent heartbeat");
+                    }
                     Err(err) => {
                         warn!("Cannot send heartbeat: {:?}", err);
                     }
                 };
-                tokio::time::sleep(Duration::from_secs(5)).await;
             }
         }
     }
@@ -203,7 +234,7 @@ impl LlmDaemon for Daemon {
 
 #[cfg(test)]
 mod tests {
-    use tokio::runtime::Runtime;
+    use tokio::runtime::{Builder as RuntimeBuilder, Runtime};
     use tracing_test::traced_test;
 
     use crate::{daemon_trait::LlmConfig as _, test_client::Generator, LlmDaemon as _};
@@ -218,7 +249,11 @@ mod tests {
         let inst = Daemon::new(conf);
 
         inst.fork_daemon()?;
-        let runtime = Runtime::new()?;
+        let runtime = RuntimeBuilder::new_current_thread()
+            .enable_time()
+            .enable_io()
+            .build()
+            .expect("failed to create runtime");
         runtime.spawn(inst.heartbeat());
         runtime.block_on(async {
             let gen = Generator::new(endpoint, None);
