@@ -71,6 +71,8 @@ impl Daemon2 {
 
 impl LlmDaemon for Daemon2 {
     fn fork_daemon(&self) -> anyhow::Result<()> {
+        // FIXME: is it okay for truncate stdout stderr files here?
+        // When a daemon is already there, it will truncate existing logs.
         let stdout: Stdio = File::create(&self.config.stdout)
             .map(|v| v.into())
             .unwrap_or_else(|err| {
@@ -141,8 +143,12 @@ impl LlmDaemon for Daemon2 {
                                loop {
                                    stream.readable().await.expect("failed to read");
                                    match stream.try_read(&mut buf) {
-                                        Ok(_) => {
-                                            debug!("Got something, continuing...");
+                                        Ok(len) => {
+                                            debug!(len = len, "Got heartbeat");
+                                            if len == 0 {
+                                                // no more data to get
+                                                break;
+                                            }
                                         }
                                         Err(_) => {
                                             break;
@@ -165,6 +171,7 @@ impl LlmDaemon for Daemon2 {
                 exit(0)
             },
             daemonize::Outcome::Parent(res) => {
+                dbg!(&res);
                 res.expect("parent should have no problem");
             },
         };

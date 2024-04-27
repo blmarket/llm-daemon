@@ -28,6 +28,8 @@ tracing-subscriber = "0.3"
 [dev-dependencies]
 tracing-test = "0.2"
 criterion = "0.5"
+langchain-rust = "4"
+async-trait = "0.1"
 
 [features]
 default = ["llama-daemon", "mlc-daemon"]
