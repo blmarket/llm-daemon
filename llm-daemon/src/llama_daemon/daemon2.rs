@@ -13,6 +13,7 @@ use tokio::runtime::Builder as RuntimeBuilder;
 use tokio::select;
 use tokio::signal::unix::{signal, SignalKind};
 use tracing::{debug, error, info, trace, warn};
+use tracing_subscriber::util::SubscriberInitExt;
 
 use crate::daemon_trait::LlmConfig;
 use crate::LlmDaemon;
@@ -97,6 +98,10 @@ impl LlmDaemon for Daemon2 {
                     );
                     exit(0)
                 }
+                let _guard = tracing_subscriber::FmtSubscriber::builder()
+                    .compact()
+                    .with_max_level(tracing::Level::TRACE)
+                    .set_default();
                 let runtime = RuntimeBuilder::new_current_thread()
                     .enable_time()
                     .enable_io()

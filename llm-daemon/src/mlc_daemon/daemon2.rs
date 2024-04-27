@@ -144,12 +144,12 @@ impl LlmDaemon for Daemon {
                         UnixListener::bind(&config.sock_file).expect("Failed to open socket");
                     let mut sigterms =
                         signal(SignalKind::terminate()).expect("failed to add SIGTERM handler");
-                    let _ = std::io::stdout().write_all(format!("Starting loop\n").as_bytes());
+                    let _ = std::io::stdout().write_all("Starting loop\n".as_bytes());
                     let _ = std::io::stdout().flush();
                     loop {
                         select! {
                            _ = sigterms.recv() => {
-                               let _ = std::io::stdout().write_all(format!("Got SIGTERM, closing\n").as_bytes());
+                               let _ = std::io::stdout().write_all("Got SIGTERM, closing\n".as_bytes());
                                break;
                            },
                            exit_status = cmd.wait() => {
@@ -158,7 +158,7 @@ impl LlmDaemon for Daemon {
                            },
                            res = listener.accept() => {
                                let Ok((mut stream, _)) = res else {
-                                   let _ = std::io::stdout().write_all(format!("Failed to accept a socket, closing\n").as_bytes());
+                                   let _ = std::io::stdout().write_all("Failed to accept a socket, closing\n".as_bytes());
                                    break;
                                };
                                let mut buf = [0u8; 32];
@@ -181,7 +181,7 @@ impl LlmDaemon for Daemon {
                                let _ = stream.shutdown().await;
                            },
                            _ = tokio::time::sleep(Duration::from_secs(2)) => {
-                               let _ = std::io::stdout().write_all(format!("No activitiy for 10 seconds, closing...\n").as_bytes());
+                               let _ = std::io::stdout().write_all("No activitiy for 10 seconds, closing...\n".as_bytes());
                                break;
                            },
                         }
@@ -194,7 +194,7 @@ impl LlmDaemon for Daemon {
                 });
                 std::fs::remove_file(&config.sock_file).ok();
                 let _ = std::io::stdout()
-                    .write_all(format!("Server closed\n").as_bytes());
+                    .write_all("Server closed\n".as_bytes());
                 exit(0)
             },
             daemonize::Outcome::Parent(res) => {

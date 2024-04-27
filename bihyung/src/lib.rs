@@ -154,13 +154,13 @@ impl ProxyDaemon {
 /// A Python module implemented in Rust.
 #[pymodule]
 fn bihyung(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
-    // TODO: Allow user to change log level, for debugging?
-    let subscriber = tracing_subscriber::FmtSubscriber::builder()
-        .with_max_level(tracing::Level::WARN)
-        .finish();
+    // // TODO: Allow user to change log level, for debugging?
+    // let subscriber = tracing_subscriber::FmtSubscriber::builder()
+    //     .with_max_level(tracing::Level::WARN)
+    //     .finish();
 
-    tracing::subscriber::set_global_default(subscriber)
-        .expect("failed to config logging");
+    // tracing::subscriber::set_global_default(subscriber)
+    //     .expect("failed to config logging");
     info!("This will be logged to stdout");
     m.add_class::<Generator>()?;
     m.add_class::<LlamaDaemon>()?;
