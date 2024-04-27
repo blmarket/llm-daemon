@@ -11,12 +11,12 @@ import random
 import difflib
 from pprint import pprint
 
-# module_path = os.path.abspath(os.path.join('./bihyung'))
-# if module_path not in sys.path:
-#     sys.path.append(module_path)
+module_path = os.path.abspath(os.path.join('./bihyung'))
+if module_path not in sys.path:
+    sys.path.append(module_path)
 
-# import maturin_import_hook
-# maturin_import_hook.install()
+import maturin_import_hook
+maturin_import_hook.install()
 from bihyung import LlamaDaemon
 
 #%%
