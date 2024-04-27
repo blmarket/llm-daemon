@@ -1,3 +1,24 @@
+## Release 0.1.2
+
+`/tmp/llama-daemon.stderr`에 데몬 로그가 추가되었습니다. 기존에는 서버의 로그만
+있었는데, 이젠 서버를 관리하는 데몬의 로그도 섞어찌개로 보이게 됩니다. 필요하면
+로그 파일을 분리해야겠죠.
+
+---
+
+## Release process
+
+좀 번거롭긴 한데... 현재는 이렇게 하고 있습니다:
+
+1. workspace 내 project들의 Cargo.toml에서 version을 업데이트합니다.
+2. `git tag 0.1.0`과 같이 태그를 만듭니다.
+3. `llm-daemon`은 `cargo publish`로 새 버전을 배포합니다.
+4. `bihyung`의 경우 Github workflow를 이용합니다. 그냥 tag를 push하면 배포가
+   됩니다.  
+   `git push github 0.1.0`
+
+---
+
 ## Python에서 fork_daemon을 호출하는 것이 조금 이상해보인다.
 
 이미 instance를 만들었는데 거기서 굳이 또 fork_daemon을 할 필요가 있나? 그냥
