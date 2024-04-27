@@ -11,7 +11,7 @@
 좀 번거롭긴 한데... 현재는 이렇게 하고 있습니다:
 
 1. workspace 내 project들의 Cargo.toml에서 version을 업데이트합니다.
-2. `git tag 0.1.0`과 같이 태그를 만듭니다.
+2. 업데이트 커밋을 생성하고 `git tag 0.1.0`과 같이 태그를 만듭니다.
 3. `llm-daemon`은 `cargo publish`로 새 버전을 배포합니다.
 4. `bihyung`의 경우 Github workflow를 이용합니다. 그냥 tag를 push하면 배포가
    됩니다.  
