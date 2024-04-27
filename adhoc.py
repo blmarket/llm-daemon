@@ -7,9 +7,6 @@ os.getcwd()
 
 #%%
 import sys
-import random
-import difflib
-from pprint import pprint
 
 module_path = os.path.abspath(os.path.join('./bihyung'))
 if module_path not in sys.path:
@@ -38,4 +35,6 @@ resp = requests.post(d.endpoint(), json = {
     "n_predict": 128,
     "max_tokens": 128,
 }).json()
-resp
+resp["content"]
+
+# %%
