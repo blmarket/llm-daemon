@@ -154,11 +154,9 @@ impl ProxyDaemon {
 /// A Python module implemented in Rust.
 #[pymodule]
 fn bihyung(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
+    // TODO: Allow user to change log level, for debugging?
     let subscriber = tracing_subscriber::FmtSubscriber::builder()
-        // all spans/events with a level higher than TRACE (e.g, debug, info, warn, etc.)
-        // will be written to stdout.
-        .with_max_level(tracing::Level::TRACE)
-        // builds the subscriber.
+        .with_max_level(tracing::Level::WARN)
         .finish();
 
     tracing::subscriber::set_global_default(subscriber)
