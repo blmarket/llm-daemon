@@ -1,3 +1,11 @@
+## Bug - inconsistent failure when port is already in use
+
+./Meta-Llama-3-8B-Instruct.Q5_K_M.llamafile -ngl 9999 --port 28282 --nobrowser
+
+이렇게 서버 띄우고 proxy.rs에 있는 테스트를 실행하면 절반 정도? 에러가 발생함.
+
+---
+
 ## Need refactoring
 
 원래 이런저런 로컬 서버를 모두 지원하고 싶어서 llama.cpp와 mlc-llm을 대상으로

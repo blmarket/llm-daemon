@@ -193,8 +193,8 @@ impl LlmDaemon for Daemon {
                     drop(temp_dir);
                 });
                 std::fs::remove_file(&config.sock_file).ok();
-                let _ = std::io::stdout()
-                    .write_all("Server closed\n".as_bytes());
+                let _ =
+                    std::io::stdout().write_all("Server closed\n".as_bytes());
                 exit(0)
             },
             daemonize::Outcome::Parent(res) => {
@@ -204,9 +204,12 @@ impl LlmDaemon for Daemon {
         Ok(())
     }
 
-    fn heartbeat(
-        &self,
-    ) -> impl Future<Output = anyhow::Result<()>> + Send + 'static {
+    fn heartbeat<'a, 'b>(
+        &'b self,
+    ) -> impl Future<Output = anyhow::Result<()>> + Send + 'a
+    where
+        'a: 'b,
+    {
         let sock_file = self.config.sock_file.clone();
         async move {
             loop {
@@ -232,7 +235,7 @@ impl LlmDaemon for Daemon {
             }
         }
     }
-    
+
     fn config(&self) -> &Self::Config {
         &self.config
     }

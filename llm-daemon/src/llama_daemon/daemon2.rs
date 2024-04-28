@@ -31,11 +31,8 @@ pub struct LlamaConfig {
 
 impl LlmConfig for LlamaConfig {
     fn endpoint(&self) -> url::Url {
-        url::Url::parse(&format!(
-            "http://127.0.0.1:{}/v1",
-            self.port
-        ))
-        .expect("failed to parse url")
+        url::Url::parse(&format!("http://127.0.0.1:{}/v1", self.port))
+            .expect("failed to parse url")
     }
 }
 
@@ -179,9 +176,11 @@ impl LlmDaemon for Daemon2 {
         Ok(())
     }
 
-    fn heartbeat(
-        &self,
-    ) -> impl futures::prelude::Future<Output = anyhow::Result<()>> + Send + 'static
+    fn heartbeat<'a, 'b>(
+        &'b self,
+    ) -> impl futures::prelude::Future<Output = anyhow::Result<()>> + Send + 'a
+    where
+        'a: 'b,
     {
         let sock_file = self.config.sock_file.clone();
         async move {
@@ -201,7 +200,7 @@ impl LlmDaemon for Daemon2 {
     }
 
     type Config = LlamaConfig;
-    
+
     fn config(&self) -> &Self::Config {
         &self.config
     }

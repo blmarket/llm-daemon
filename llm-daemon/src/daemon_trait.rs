@@ -9,7 +9,7 @@ pub trait LlmConfig {
 /// maintaining a heartbeat, and generating responses based on prompts.
 pub trait LlmDaemon {
     type Config: LlmConfig;
-    
+
     fn config(&self) -> &Self::Config;
 
     /// Spawns the daemon, initializing any necessary resources or processes.
@@ -22,25 +22,26 @@ pub trait LlmDaemon {
     /// Daemon is expected to terminate if there's no heartbeat for a certain period of time.
     /// Keeping this task within async runtime will ensure that the daemon is kept running
     /// during the application.
-    fn heartbeat(
-        &self,
-    ) -> impl Future<Output = anyhow::Result<()>> + Send + 'static;
-    
+    fn heartbeat<'a, 'b>(
+        &'b self,
+    ) -> impl Future<Output = anyhow::Result<()>> + Send + 'a
+    where
+        'a: 'b;
+
     fn ready<'a>(&self) -> impl Future<Output = ()> + Send + 'a {
         let client = reqwest::Client::new();
         let endpoint = self.config().endpoint().clone();
         async move {
             for _ in 0..300 {
-                let res = client.get(endpoint.as_str())
-                    .send()
-                    .await;
+                let res = client.get(endpoint.as_str()).send().await;
                 match res {
                     Ok(_) => {
                         break;
                     },
                     Err(_) => {
-                        tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
-                    }
+                        tokio::time::sleep(tokio::time::Duration::from_secs(1))
+                            .await;
+                    },
                 }
             }
         }

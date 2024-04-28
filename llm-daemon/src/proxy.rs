@@ -1,3 +1,4 @@
+use std::future::IntoFuture;
 use std::sync::Arc;
 
 use axum::body::BodyDataStream;
@@ -6,6 +7,7 @@ use axum::http::HeaderValue;
 use axum::response::IntoResponse;
 use axum::routing::post;
 use axum::Router;
+use futures::FutureExt;
 use hyper::body::Incoming;
 use hyper::{Response, StatusCode};
 use hyper_util::client::legacy::connect::HttpConnector;
@@ -64,20 +66,25 @@ impl<D: LlmDaemon> LlmDaemon for Proxy<D> {
         self.inner.fork_daemon()
     }
 
-    fn heartbeat(
-        &self,
-    ) -> impl futures::prelude::Future<Output = anyhow::Result<()>> + Send + 'static
+    fn heartbeat<'a, 'b>(
+        &'b self,
+    ) -> impl futures::prelude::Future<Output = anyhow::Result<()>> + Send + 'a
+    where
+        'a: 'b,
     {
         let port = self.config.port;
-        let hb = self.inner.heartbeat();
+        // boxed() is due to https://github.com/rust-lang/rust/issues/100013
+        let hb = self.inner.heartbeat().boxed();
+        let proxy = run_proxy(port).boxed();
+        
         async move {
-            let (r1, r2) = futures::join!(hb, run_proxy(port));
+            let (r0, r1) = futures::join!(hb, proxy);
+            r0?;
             r1?;
-            r2?;
             Ok(())
         }
     }
-    
+
     fn config(&self) -> &Self::Config {
         &self.config
     }
@@ -187,6 +194,7 @@ mod tests {
         let runtime = Runtime::new()?;
         runtime.spawn(inst.heartbeat());
         runtime.block_on(async {
+            inst.ready().await;
             tokio::time::sleep(Duration::from_millis(1000)).await;
             let gen = Generator::new(endpoint, None);
             let resp = gen
