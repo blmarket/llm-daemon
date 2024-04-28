@@ -7,6 +7,7 @@ fn main() -> anyhow::Result<()> {
     let runtime = tokio::runtime::Runtime::new()?;
     runtime.spawn(daemon.heartbeat());
     runtime.block_on(async {
+        daemon.ready().await;
         // FIXME: Use endpoint provided by daemon
         // daemon needs startup time
         let oai: OpenAI<OpenAIConfig> = OpenAI::new(OpenAIConfig::new().with_api_base(
@@ -24,7 +25,7 @@ fn main() -> anyhow::Result<()> {
             ..Default::default()
         });
         let resp2 = oai2.generate(&vec![msg1, msg2]).await?;
-        dbg!(resp2);
+        assert_eq!(resp2.generation, "15");
 
         Ok(())
     })
