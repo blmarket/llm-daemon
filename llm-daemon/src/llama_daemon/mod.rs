@@ -1,6 +1,8 @@
 mod daemon2;
+mod llamafile;
 
 pub use daemon2::{Daemon2, LlamaConfig};
+pub use llamafile::{Llamafile, Config as LlamafileConfig};
 
 #[cfg(test)]
 mod tests {
