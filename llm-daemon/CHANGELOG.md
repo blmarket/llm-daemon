@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 23 commits contributed to the release over the course of 2 calendar days.
+ - 24 commits contributed to the release over the course of 2 calendar days.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
 
@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Adjusting changelogs prior to release of llm-daemon v0.2.0 ([`b3f879f`](https://github.com/blmarket/llm-daemon/commit/b3f879fb594e6d2b194de806b969b67c9dcd384c))
     - Adjusting changelogs prior to release of llm-daemon v0.1.4 ([`71f8c5e`](https://github.com/blmarket/llm-daemon/commit/71f8c5e2f8f4685850be226d5b4e158862f8d0f3))
     - Make mlc daemon test code to use ready ([`14f3f9d`](https://github.com/blmarket/llm-daemon/commit/14f3f9df89896d334bcc5e709ec36f12e9386f61))
     - Change mlc-serv python version from 3.11 to 3.10 ([`7c99f3a`](https://github.com/blmarket/llm-daemon/commit/7c99f3ae167d1c5be04ced4299818668f9c5b1ad))
