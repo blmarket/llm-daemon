@@ -18,6 +18,7 @@ use tracing_subscriber::util::SubscriberInitExt;
 use crate::daemon_trait::LlmConfig;
 use crate::LlmDaemon;
 
+#[derive(Debug)]
 pub struct LlamaConfig {
     pub server_path: PathBuf,
     pub model_path: PathBuf,
@@ -110,6 +111,7 @@ impl LlmDaemon for Daemon2 {
                     .build()
                     .expect("failed to create runtime");
                 runtime.block_on(async {
+                    trace!(config = format!("{:?}", self.config), "Starting server");
                     let mut cmd = Command::new(self.config.server_path.clone())
                         .arg("--port")
                         .arg(self.config.port.to_string())
@@ -121,7 +123,7 @@ impl LlmDaemon for Daemon2 {
                         .arg(&self.config.model_path)
                         .kill_on_drop(true)
                         .spawn()
-                        .expect("should run");
+                        .expect("failed to execute server");
 
                     let listener =
                         UnixListener::bind(&self.config.sock_file).expect("Failed to open socket");
