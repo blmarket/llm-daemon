@@ -2,7 +2,7 @@ pub const PYPROJECT: &str = r#"[project]
 name = "mlc-serv"
 license = { text = "Proprietary" }
 version = "0.1.0"
-requires-python = ">= 3.11, < 3.12"
+requires-python = ">= 3.9, < 3.12"
 dependencies = [
     "fastapi",
     "mlc-llm-nightly-cu122 ; sys_platform != 'darwin'",
@@ -14,9 +14,9 @@ dependencies = [
 
 pub const SCRIPT: &str = r#"#!/bin/bash
 
-export PYTHON=python3.11
-export APP_PATH=~/.cache/mlc-app-2
-export VERSION='0.2.2'
+export PYTHON=python3.10
+export APP_PATH=~/.cache/mlc-app
+export VERSION='0.2.3'
 
 # check $APP_PATH and $APP_PATH/placeholder exists
 if ! [[ -d $APP_PATH && -f $APP_PATH/placeholder && "$(cat $APP_PATH/placeholder)" = "$VERSION" ]]; then
