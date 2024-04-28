@@ -30,7 +30,7 @@ pub trait LlmDaemon {
         let client = reqwest::Client::new();
         let endpoint = self.config().endpoint().clone();
         async move {
-            for _ in 0..30 {
+            for _ in 0..300 {
                 let res = client.get(endpoint.as_str())
                     .send()
                     .await;
