@@ -1,3 +1,15 @@
+## Need refactoring
+
+원래 이런저런 로컬 서버를 모두 지원하고 싶어서 llama.cpp와 mlc-llm을 대상으로
+두 개의 daemon 구현체를 만들어봤었는데, 만들고 보니까 비슷비슷한 코드가 두 벌로
+중복되는 것 같다. 합칠 수 있는 부분은 합치는 것이 좋을 것 같다. 예를 들자면:
+
+- 실제 server를 감시하면서 heartbeat를 받는 부분
+  - tokio의 current_thread_runtime을 생성하는 부분
+  - 해당 runtime에서 select!로 이런저런 이벤트를 처리하는 부분
+
+---
+
 ## Release 0.1.2
 
 `/tmp/llama-daemon.stderr`에 데몬 로그가 추가되었습니다. 기존에는 서버의 로그만
