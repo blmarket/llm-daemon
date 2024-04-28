@@ -9,7 +9,7 @@ name = "bihyung"
 crate-type = ["cdylib"]
 
 [dependencies]
-llm-daemon = { path = "../llm-daemon" }
+llm-daemon = "0.1.3"
 pyo3 = "0.20.0"
 pyo3-asyncio = { version = "0.20", features = ["tokio-runtime"] }
 tokio = { workspace = true }
