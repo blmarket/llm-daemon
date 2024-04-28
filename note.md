@@ -1,3 +1,15 @@
+## Better release with cargo workspaces
+
+```
+cargo workspaces version
+```
+
+요렇게 하면 모든 프로젝트의 버전을 한 번에 올릴 수 있습니다. 하는김에 crates.io
+publish도 Github action으로 자동화해 놨으니 이제 버전업만 하고 tag만 push하면 되지
+않을까요?
+
+---
+
 ## Bug - inconsistent failure when port is already in use
 
 ./Meta-Llama-3-8B-Instruct.Q5_K_M.llamafile -ngl 9999 --port 28282 --nobrowser
