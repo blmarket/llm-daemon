@@ -263,6 +263,7 @@ mod tests {
             .expect("failed to create runtime");
         runtime.spawn(inst.heartbeat());
         runtime.block_on(async {
+            inst.ready().await;
             let gen = Generator::new(endpoint, None);
             let resp = gen
                 .generate("<bos>Sum of 7 and 8 is ".to_string())
