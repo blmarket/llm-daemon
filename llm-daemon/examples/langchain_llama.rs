@@ -1,4 +1,4 @@
-use llm_daemon::{LlamaConfig, LlamaDaemon, LlmDaemon};
+use llm_daemon::{LlamaConfig, LlamaDaemon, LlmConfig, LlmDaemon};
 use langchain_rust::{language_models::{llm::LLM, options::CallOptions}, llm::{OpenAI, OpenAIConfig}, schemas::Message};
 
 fn main() -> anyhow::Result<()> {
@@ -11,7 +11,7 @@ fn main() -> anyhow::Result<()> {
         // FIXME: Use endpoint provided by daemon
         // daemon needs startup time
         let oai: OpenAI<OpenAIConfig> = OpenAI::new(OpenAIConfig::new().with_api_base(
-            "http://127.0.0.1:28282/v1".to_string()));
+            daemon.config().endpoint().to_string()));
         let msg0 = Message::new_human_message("Hello, how are you?");
         let resp1 = oai.generate(&vec![msg0]).await?;
         dbg!(resp1);
