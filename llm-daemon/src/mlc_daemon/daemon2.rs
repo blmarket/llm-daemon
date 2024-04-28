@@ -232,6 +232,10 @@ impl LlmDaemon for Daemon {
             }
         }
     }
+    
+    fn config(&self) -> &Self::Config {
+        &self.config
+    }
 }
 
 #[cfg(test)]

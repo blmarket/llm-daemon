@@ -77,6 +77,10 @@ impl<D: LlmDaemon> LlmDaemon for Proxy<D> {
             Ok(())
         }
     }
+    
+    fn config(&self) -> &Self::Config {
+        &self.config
+    }
 }
 
 async fn inner(

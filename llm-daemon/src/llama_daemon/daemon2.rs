@@ -171,7 +171,6 @@ impl LlmDaemon for Daemon2 {
                 exit(0)
             },
             daemonize::Outcome::Parent(res) => {
-                dbg!(&res);
                 res.expect("parent should have no problem");
             },
         };
@@ -200,6 +199,10 @@ impl LlmDaemon for Daemon2 {
     }
 
     type Config = LlamaConfig;
+    
+    fn config(&self) -> &Self::Config {
+        &self.config
+    }
 }
 
 #[cfg(test)]

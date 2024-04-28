@@ -9,6 +9,8 @@ pub trait LlmConfig {
 /// maintaining a heartbeat, and generating responses based on prompts.
 pub trait LlmDaemon {
     type Config: LlmConfig;
+    
+    fn config(&self) -> &Self::Config;
 
     /// Spawns the daemon, initializing any necessary resources or processes.
     /// This method is expected to be called before creation of tokio runtime, mostly
@@ -23,4 +25,24 @@ pub trait LlmDaemon {
     fn heartbeat(
         &self,
     ) -> impl Future<Output = anyhow::Result<()>> + Send + 'static;
+    
+    fn ready<'a>(&self) -> impl Future<Output = ()> + Send + 'a {
+        let client = reqwest::Client::new();
+        let endpoint = self.config().endpoint().clone();
+        async move {
+            for _ in 0..30 {
+                let res = client.get(endpoint.as_str())
+                    .send()
+                    .await;
+                match res {
+                    Ok(_) => {
+                        break;
+                    },
+                    Err(_) => {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+                    }
+                }
+            }
+        }
+    }
 }
