@@ -37,11 +37,6 @@ jobs:
         with:
           name: wheels-linux-${{ matrix.platform.target }}
           path: dist
-      - name: Install Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly
-          override: true
       - run: cargo build --release --all-features
 
   macos:
