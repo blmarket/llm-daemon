@@ -108,6 +108,7 @@ jobs:
         with:
           command: upload
           args: --non-interactive --skip-existing wheels-*/*
+      - uses: actions/checkout@v4
       - name: Publish to crates.io
         uses: actions-rs/cargo@v1
         with:
