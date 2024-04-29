@@ -1,7 +1,8 @@
 ## Better release with cargo workspaces
 
 ```
-cargo workspaces version
+cargo workspaces version --force '*'
+git push github main vx.y.z
 ```
 
 요렇게 하면 모든 프로젝트의 버전을 한 번에 올릴 수 있습니다. 하는김에 crates.io
