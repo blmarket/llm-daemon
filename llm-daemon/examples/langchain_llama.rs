@@ -1,6 +1,8 @@
 use llm_daemon::{LlamaConfig, LlamaDaemon, LlmConfig, LlmDaemon};
 use langchain_rust::{language_models::{llm::LLM, options::CallOptions}, llm::{OpenAI, OpenAIConfig}, schemas::Message};
 
+/// Even though this example uses langchain_rust, I don't support it for usages.
+/// Seems the library is quite big so I stepped back from using it.
 fn main() -> anyhow::Result<()> {
     let daemon = LlamaDaemon::new(LlamaConfig::default());
     daemon.fork_daemon()?;
@@ -13,7 +15,7 @@ fn main() -> anyhow::Result<()> {
         let oai: OpenAI<OpenAIConfig> = OpenAI::new(OpenAIConfig::new().with_api_base(
             daemon.config().endpoint().to_string()));
         let msg0 = Message::new_human_message("Hello, how are you?");
-        let resp1 = oai.generate(&vec![msg0]).await?;
+        let resp1 = oai.generate(&[msg0]).await?;
         dbg!(resp1);
         
         let msg1 = Message::new_human_message("What is the sum of 7 and 8?");
@@ -24,7 +26,7 @@ fn main() -> anyhow::Result<()> {
             stop_words: Some(vec![".".to_string()]),
             ..Default::default()
         });
-        let resp2 = oai2.generate(&vec![msg1, msg2]).await?;
+        let resp2 = oai2.generate(&[msg1, msg2]).await?;
         assert_eq!(resp2.generation, "15");
 
         Ok(())

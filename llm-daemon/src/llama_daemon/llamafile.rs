@@ -114,13 +114,13 @@ trait LlmDaemonCommand {
     fn sock_file(&self) -> &PathBuf;
 
     fn fork_daemon(&self) -> anyhow::Result<()> {
-        let stdout: Stdio = File::create(&self.stdout())
+        let stdout: Stdio = File::create(self.stdout())
             .map(|v| v.into())
             .unwrap_or_else(|err| {
                 warn!("failed to open stdout: {:?}", err);
                 Stdio::keep()
             });
-        let stderr: Stdio = File::create(&self.stderr())
+        let stderr: Stdio = File::create(self.stderr())
             .map(|v| v.into())
             .unwrap_or_else(|err| {
                 warn!("failed to open stderr: {:?}", err);
@@ -161,7 +161,7 @@ trait LlmDaemonCommand {
                     };
 
                     let listener =
-                        UnixListener::bind(&self.sock_file()).expect("Failed to open socket");
+                        UnixListener::bind(self.sock_file()).expect("Failed to open socket");
                     let mut sigterms =
                         signal(SignalKind::terminate()).expect("failed to add SIGTERM handler");
                     loop {
@@ -203,7 +203,7 @@ trait LlmDaemonCommand {
                     // Child might be already killed, so ignore the error
                     cmd.kill().await.ok();
                 });
-                std::fs::remove_file(&self.sock_file()).ok();
+                std::fs::remove_file(self.sock_file()).ok();
                 info!("Server closed");
                 exit(0)
             },
@@ -268,7 +268,7 @@ mod tests {
     use tokio::runtime::Builder as RuntimeBuilder;
     use tracing_test::traced_test;
 
-    use super::{Config, Llamafile};
+    use super::Llamafile;
     use crate::{Generator, LlmConfig as _, LlmDaemon};
 
     #[traced_test]
