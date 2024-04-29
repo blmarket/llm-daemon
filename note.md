@@ -1,3 +1,15 @@
+## Better release with cargo workspaces
+
+```
+cargo workspaces version
+```
+
+요렇게 하면 모든 프로젝트의 버전을 한 번에 올릴 수 있습니다. 하는김에 crates.io
+publish도 Github action으로 자동화해 놨으니 이제 버전업만 하고 tag만 push하면 되지
+않을까요?
+
+---
+
 ## Unfixable timing bug
 
 방금 유닛 테스트 돌리다가 발견한 버그인데, 아마 못고칠거야.
@@ -8,18 +20,6 @@
 
 데몬 timeout을 더 길게 잡으면 발생가능성이 0에 수렴할 테지만, 바꿀지 말지 아직은
 좀 아리까리...
-
----
-
-## Better release with cargo workspaces
-
-```
-cargo workspaces version
-```
-
-요렇게 하면 모든 프로젝트의 버전을 한 번에 올릴 수 있습니다. 하는김에 crates.io
-publish도 Github action으로 자동화해 놨으니 이제 버전업만 하고 tag만 push하면 되지
-않을까요?
 
 ---
 
