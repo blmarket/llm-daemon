@@ -37,6 +37,9 @@ jobs:
         with:
           name: wheels-linux-${{ matrix.platform.target }}
           path: dist
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
       - name: Build crate
         uses: actions-rs/cargo@v1
         with:
