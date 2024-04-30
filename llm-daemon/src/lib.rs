@@ -5,6 +5,7 @@ mod llama_daemon;
 mod mlc_daemon;
 mod proxy;
 mod test_client;
+mod util;
 
 pub use daemon_trait::{LlmConfig, LlmDaemon};
 #[cfg(feature = "llama-daemon")]
