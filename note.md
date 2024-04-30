@@ -1,3 +1,19 @@
+## Performance issue with the LLM models
+
+llamafile Llama-3-8B 모델로 모두 대통합하려고 했는데, 막상 해보니까 내가 쓰려는
+곳에서 생각보다 너무 느리다. 미워도 다시한번 mlc-llm으로 다시 시도해봐야 하나?
+전반적으로 내가 쓰려는 요구조건에 맞춰서 벤치마크를 만들고 여러 모델에서
+검증해볼 필요가 있겠다는 생각이 든다.
+
+- 서버 application
+- 모델
+- size 및 quantization
+- 테스트 케이스
+  - 하나의 테스트 케이스에 여러 개의 checkpoint가 있으면 보기 좋을 것 같다.
+- 시간 (millisec 단위)
+
+---
+
 ## Better release with cargo workspaces
 
 ```
