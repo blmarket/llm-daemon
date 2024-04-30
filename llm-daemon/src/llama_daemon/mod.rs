@@ -17,7 +17,7 @@ mod tests {
     #[test]
     fn it_works() -> anyhow::Result<()> {
         let config = LlamaConfig::default();
-        let url = config.endpoint();
+        let url = config.endpoint().join("/completion")?;
         let inst = Daemon::new(config);
         inst.fork_daemon()?;
 

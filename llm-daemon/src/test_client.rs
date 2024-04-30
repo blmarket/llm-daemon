@@ -5,7 +5,7 @@ use futures::{Future, FutureExt as _};
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use tracing::{debug, info, warn};
+use tracing::{debug, error, info, warn};
 use url::Url;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -81,11 +81,15 @@ impl Generator {
             return Err(true);
         }
         if !res.status().is_success() {
+            error!(status = res.status().as_u16(), "got an erronous response");
             return Err(false);
         }
 
         // Assume all error happening here is unrecoverable
-        res.text().await.map_err(|_| false)
+        res.text().await.map_err(|err| {
+            error!(err = format!("{:?}", err), "failed to get response");
+            false
+        })
     }
 
     async fn retry<R: Future<Output = Result<String, bool>>, F: Fn() -> R>(
