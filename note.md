@@ -1,3 +1,11 @@
+## bootstrapping timeout of llm-daemon
+
+알지 못할 이유로 초기 데몬 bootstrap 중에 heartbeat를 받지 못하고 timeout이
+발생하고 있다. 맥북에서 발생하는 걸 발견했는데 리눅스에서도 동일한 문제가
+있는지는 잘 모르겠다.
+
+---
+
 ## Better release with cargo workspaces
 
 ```
