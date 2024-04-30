@@ -1,3 +1,16 @@
+## Better release with cargo workspaces
+
+```
+cargo workspaces version --force '*'
+git push github main vx.y.z
+```
+
+요렇게 하면 모든 프로젝트의 버전을 한 번에 올릴 수 있습니다. 하는김에 crates.io
+publish도 Github action으로 자동화해 놨으니 이제 버전업만 하고 tag만 push하면 되지
+않을까요?
+
+---
+
 ## Performance issue with the LLM models
 
 llamafile Llama-3-8B 모델로 모두 대통합하려고 했는데, 막상 해보니까 내가 쓰려는
@@ -11,19 +24,6 @@ llamafile Llama-3-8B 모델로 모두 대통합하려고 했는데, 막상 해�
 - 테스트 케이스
   - 하나의 테스트 케이스에 여러 개의 checkpoint가 있으면 보기 좋을 것 같다.
 - 시간 (millisec 단위)
-
----
-
-## Better release with cargo workspaces
-
-```
-cargo workspaces version --force '*'
-git push github main vx.y.z
-```
-
-요렇게 하면 모든 프로젝트의 버전을 한 번에 올릴 수 있습니다. 하는김에 crates.io
-publish도 Github action으로 자동화해 놨으니 이제 버전업만 하고 tag만 push하면 되지
-않을까요?
 
 ---
 
