@@ -13,8 +13,8 @@ use tokio::signal::unix::{signal, SignalKind};
 use tracing::{debug, error, info, trace, warn};
 use tracing_subscriber::util::SubscriberInitExt;
 
-pub trait LlmDaemonCommand {
-    fn spawn(&self) -> std::io::Result<Child>;
+pub trait LlmDaemonCommand<S> {
+    fn spawn(&self) -> std::io::Result<(Child, S)>;
     fn stdout(&self) -> &PathBuf;
     fn stderr(&self) -> &PathBuf;
     fn pid_file(&self) -> &PathBuf;
@@ -59,7 +59,7 @@ pub trait LlmDaemonCommand {
                     .expect("failed to create runtime");
                 runtime.block_on(async {
                     info!("Starting server");
-                    let mut cmd = match self.spawn() {
+                    let (mut cmd, _guard_state) = match self.spawn() {
                         Ok(v) => v,
                         Err(err) => {
                             error!(err = format!("{:?}", err), "failed to execute server");

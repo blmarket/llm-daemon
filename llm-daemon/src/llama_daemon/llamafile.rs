@@ -59,8 +59,8 @@ impl Llamafile {
     }
 }
 
-impl LlmDaemonCommand for Llamafile {
-    fn spawn(&self) -> std::io::Result<Child> {
+impl LlmDaemonCommand<()> for Llamafile {
+    fn spawn(&self) -> std::io::Result<(Child, ())> {
         info!(
             path = self.config.llamafile_path.to_string_lossy().as_ref(),
             "Executing llamafile"
@@ -75,7 +75,8 @@ impl LlmDaemonCommand for Llamafile {
                 self.config.port
             ))
             .kill_on_drop(true)
-            .spawn();
+            .spawn()
+            .map(|v| (v, ()));
         info!("Child spawned successfully");
         ret
     }

@@ -1,6 +1,5 @@
 use std::fs::{File, Permissions};
 use std::io::Write as _;
-use std::mem;
 use std::os::unix::fs::PermissionsExt as _;
 use std::path::PathBuf;
 
@@ -10,7 +9,7 @@ use tokio::process::Command;
 use url::Url;
 
 use crate::daemon_trait::LlmConfig;
-use crate::mlc_daemon::bootstrap::{PYPROJECT, SCRIPT};
+use crate::mlc_daemon::bootstrap::{script, PYPROJECT};
 use crate::util::LlmDaemonCommand;
 use crate::LlmDaemon;
 
@@ -19,12 +18,10 @@ pub struct DaemonConfig {
     pub pid_file: PathBuf,
     pub stdout: PathBuf,
     pub stderr: PathBuf,
-    // default: 127.0.0.1
     pub host: String,
-    // default: 8000
     pub port: u16,
-    // default: HF://mlc-ai/gemma-2b-it-q4f16_1-MLC
     pub model: String,
+    pub python: String,
 }
 
 impl Default for DaemonConfig {
@@ -37,6 +34,7 @@ impl Default for DaemonConfig {
             host: "127.0.0.1".to_string(),
             port: 8000,
             model: "HF://mlc-ai/gemma-2b-it-q4f16_1-MLC".to_string(),
+            python: "python3.11".to_string(),
         }
     }
 }
@@ -61,8 +59,14 @@ impl Daemon {
     }
 }
 
-impl LlmDaemonCommand for Daemon {
-    fn spawn(&self) -> std::io::Result<tokio::process::Child> {
+struct State {
+    // This will keep the tempdir stay alive
+    #[allow(unused)]
+    temp_dir: TempDir,
+}
+
+impl LlmDaemonCommand<State> for Daemon {
+    fn spawn(&self) -> std::io::Result<(tokio::process::Child, State)> {
         let bootstrap: anyhow::Result<(TempDir, PathBuf)> = (|| {
             let temp_dir = tempfile::tempdir()?;
             let _ = std::io::stdout().write_all(
@@ -74,7 +78,7 @@ impl LlmDaemonCommand for Daemon {
             file1.sync_all()?;
             let file2_path = temp_dir.path().join("script.sh");
             let mut file2 = File::create(file2_path.clone())?;
-            file2.write_all(SCRIPT.as_bytes())?;
+            file2.write_all(script(&self.config.python).as_bytes())?;
             file2.sync_all()?;
             std::fs::set_permissions(
                 file2_path.clone(),
@@ -90,16 +94,19 @@ impl LlmDaemonCommand for Daemon {
             panic!("what should I do");
         };
         let port = self.config.port.to_string();
-        let args: Vec<&str> =
-            vec![&self.config.model, "--host", &self.config.host, "--port", &port];
-        let ret = Command::new(file2_path)
+        let args: Vec<&str> = vec![
+            &self.config.model,
+            "--host",
+            &self.config.host,
+            "--port",
+            &port,
+        ];
+        Command::new(file2_path)
             .current_dir(temp_dir.path())
             .args(args)
             .kill_on_drop(true)
-            .spawn();
-        // FIXME: need to clean up temp_dir properly
-        mem::forget(temp_dir);
-        ret
+            .spawn()
+            .map(|v| (v, State { temp_dir }))
     }
 
     fn stdout(&self) -> &PathBuf {
@@ -125,16 +132,17 @@ impl LlmDaemon for Daemon {
     fn config(&self) -> &Self::Config {
         &self.config
     }
-    
+
     fn fork_daemon(&self) -> anyhow::Result<()> {
         LlmDaemonCommand::fork_daemon(self)
     }
-    
+
     fn heartbeat<'a, 'b>(
         &'b self,
     ) -> impl Future<Output = anyhow::Result<()>> + Send + 'a
     where
-        'a: 'b {
+        'a: 'b,
+    {
         LlmDaemonCommand::heartbeat(self)
     }
 }

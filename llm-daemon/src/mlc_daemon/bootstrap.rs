@@ -2,7 +2,7 @@ pub const PYPROJECT: &str = r#"[project]
 name = "mlc-serv"
 license = { text = "Proprietary" }
 version = "0.1.0"
-requires-python = ">= 3.9, < 3.12"
+requires-python = ">= 3.9, <= 3.12"
 dependencies = [
     "fastapi",
     "mlc-llm-nightly-cu122 ; sys_platform != 'darwin'",
@@ -12,16 +12,20 @@ dependencies = [
 ]
 "#;
 
-pub const SCRIPT: &str = r#"#!/bin/bash
+pub fn script(python: &str) -> String {
+    format!(r#"#!/bin/bash
 
-export PYTHON=python3.10
+export PYTHON={}
+export VERSION='{}-0.2.4'
+export VENV_PATH=~/.cache/mlc-venv-$PYTHON
 export APP_PATH=~/.cache/mlc-app
-export VERSION='0.2.3'
 
 # check $APP_PATH and $APP_PATH/placeholder exists
 if ! [[ -d $APP_PATH && -f $APP_PATH/placeholder && "$(cat $APP_PATH/placeholder)" = "$VERSION" ]]; then
-	# Big headache - what if user does not have pip?
-	$PYTHON -m pip install -f 'https://mlc.ai/wheels' . --target $APP_PATH
+    if ! [[ -d $VENV_PATH ]]; then
+        $PYTHON -m venv $VENV_PATH
+    fi
+	~/.cache/mlc-venv-$PYTHON/bin/pip3 install -U -f 'https://mlc.ai/wheels' . --target $APP_PATH
 	echo -n $VERSION > $APP_PATH/placeholder
 fi
 
@@ -29,4 +33,5 @@ cd $APP_PATH
 
 # Lesson learned: Use exec so parent can kill python
 exec $PYTHON -m mlc_llm serve $@
-"#;
+"#, python, python)
+}
