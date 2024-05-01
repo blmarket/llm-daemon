@@ -282,7 +282,7 @@ checksum = "9475866fec1451be56a3c2400fd081ff546538961565ccb5b7142cbd22bc7a51"
 
 [[package]]
 name = "bihyung"
-version = "0.2.6"
+version = "0.2.7"
 dependencies = [
  "enum_dispatch",
  "llm-daemon 0.2.0",
@@ -1687,7 +1687,7 @@ dependencies = [
 
 [[package]]
 name = "llm-daemon"
-version = "0.2.6"
+version = "0.2.7"
 dependencies = [
  "anyhow",
  "async-trait",
