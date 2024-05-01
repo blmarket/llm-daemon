@@ -75,7 +75,7 @@ impl<D: LlmDaemon> LlmDaemon for Proxy<D> {
         // boxed() is due to https://github.com/rust-lang/rust/issues/100013
         let hb = self.inner.heartbeat().boxed();
         let proxy = run_proxy(port).boxed();
-        
+
         async move {
             let (r0, r1) = futures::join!(hb, proxy);
             r0?;

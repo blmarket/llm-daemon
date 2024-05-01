@@ -43,7 +43,8 @@ pub trait LlmDaemonCommand<S> {
             daemonize::Outcome::Child(res) => {
                 if let Err(err) = res {
                     // Worst code ever! but I have no other way to inspect err
-                    if format!("{}", err) != "unable to lock pid file, errno 11" {
+                    if format!("{}", err) != "unable to lock pid file, errno 11"
+                    {
                         eprintln!("{}", err);
                     }
                     exit(0)

@@ -50,11 +50,11 @@ pub enum LlamaConfigs {
     Phi3,
 }
 
-pub fn llamaConfigMap() -> &'static HashMap<LlamaConfigs, LlamaConfig> {
-    static configMap: OnceLock<HashMap<LlamaConfigs, LlamaConfig>> =
+pub fn llama_config_map() -> &'static HashMap<LlamaConfigs, LlamaConfig> {
+    static CONFIG_MAP: OnceLock<HashMap<LlamaConfigs, LlamaConfig>> =
         OnceLock::new();
 
-    configMap.get_or_init(|| {
+    CONFIG_MAP.get_or_init(|| {
         let llama3: LlamaConfig = LlamaConfig {
             server_path: PathBuf::from(env!("HOME"))
                 .join("proj/llama.cpp/build/bin/server"),
@@ -157,11 +157,11 @@ impl LlmDaemon for Daemon {
 
 #[cfg(test)]
 mod tests {
-    use super::{llamaConfigMap, Daemon, LlamaConfigs};
+    use super::{llama_config_map, Daemon, LlamaConfigs};
 
     #[test]
     fn launch_daemon() -> anyhow::Result<()> {
-        let _ = Daemon::new(llamaConfigMap()[&LlamaConfigs::Llama3].clone());
+        let _ = Daemon::new(llama_config_map()[&LlamaConfigs::Llama3].clone());
         Ok(())
     }
 }

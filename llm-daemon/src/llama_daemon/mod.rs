@@ -1,8 +1,8 @@
 mod daemon3;
 mod llamafile;
 
-pub use daemon3::{Daemon, LlamaConfig, LlamaConfigs, llamaConfigMap};
-pub use llamafile::{Llamafile, Config as LlamafileConfig};
+pub use daemon3::{llama_config_map, Daemon, LlamaConfig, LlamaConfigs};
+pub use llamafile::{Config as LlamafileConfig, Llamafile};
 
 #[cfg(test)]
 mod tests {
@@ -11,7 +11,7 @@ mod tests {
 
     use super::{Daemon, LlamaConfig};
     use crate::daemon_trait::LlmConfig as _;
-    use crate::llama_daemon::{llamaConfigMap, LlamaConfigs};
+    use crate::llama_daemon::{llama_config_map, LlamaConfigs};
     use crate::{Generator, LlmDaemon as _};
 
     #[traced_test]
@@ -43,7 +43,7 @@ mod tests {
     #[traced_test]
     #[test]
     fn it_works_with_phi3() -> anyhow::Result<()> {
-        let config = llamaConfigMap()[&LlamaConfigs::Phi3].clone();
+        let config = llama_config_map()[&LlamaConfigs::Phi3].clone();
         let url = config.endpoint().join("/completion")?;
         let inst = Daemon::new(config);
         inst.fork_daemon()?;

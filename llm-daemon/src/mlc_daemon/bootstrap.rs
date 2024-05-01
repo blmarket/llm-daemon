@@ -13,7 +13,8 @@ dependencies = [
 "#;
 
 pub fn script(python: &str) -> String {
-    format!(r#"#!/bin/bash
+    format!(
+        r#"#!/bin/bash
 
 export PYTHON={}
 export VERSION=$PYTHON-0.3.0
@@ -36,5 +37,7 @@ cd $APP_PATH
 
 # Lesson learned: Use exec so parent can kill python
 exec python -m mlc_llm serve $@
-"#, python)
+"#,
+        python
+    )
 }
