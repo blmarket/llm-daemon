@@ -7,9 +7,11 @@ use langchain_rust::schemas::Message;
 use llm_daemon::{Llamafile, LlmConfig, LlmDaemon};
 
 fn main() -> anyhow::Result<()> {
-    let daemon = Llamafile::from_path(
+    let daemon = Llamafile::from(
         PathBuf::from(std::env!("HOME"))
             .join("proj/Meta-Llama-3-8B-Instruct.Q5_K_M.llamafile"),
+        "llama3-8b",
+        8123,
     );
     daemon.fork_daemon()?;
     let runtime = tokio::runtime::Runtime::new()?;

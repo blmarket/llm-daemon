@@ -1,3 +1,4 @@
+use std::error::Error;
 use std::fs::File;
 use std::path::PathBuf;
 use std::process::exit;
@@ -41,11 +42,11 @@ pub trait LlmDaemonCommand<S> {
 
         match daemon.execute() {
             daemonize::Outcome::Child(res) => {
-                if res.is_err() {
-                    eprintln!(
-                        "Maybe another daemon is already running: {:?}",
-                        res.err()
-                    );
+                if let Err(err) = res {
+                    // Worst code ever! but I have no other way to inspect err
+                    if format!("{}", err) != "unable to lock pid file, errno 11" {
+                        eprintln!("{}", err);
+                    }
                     exit(0)
                 }
                 let _guard = tracing_subscriber::FmtSubscriber::builder()
@@ -101,8 +102,8 @@ pub trait LlmDaemonCommand<S> {
                                }
                                stream.shutdown().await.expect("failed to close socket");
                            },
-                           _ = tokio::time::sleep(Duration::from_secs(10)) => {
-                               info!("no activity for 10 seconds, closing...");
+                           _ = tokio::time::sleep(Duration::from_secs(30)) => {
+                               info!("no activity for 30 seconds, closing...");
                                break;
                            },
                         }

@@ -139,9 +139,11 @@ mod tests {
     #[traced_test]
     #[test]
     fn it_works() -> anyhow::Result<()> {
-        let inst = Llamafile::from_path(
+        let inst = Llamafile::from(
             PathBuf::from(std::env!("HOME"))
                 .join("proj/Meta-Llama-3-8B-Instruct.Q5_K_M.llamafile"),
+            "llama3-8b",
+            8123,
         );
         inst.fork_daemon()?;
         let url = inst.config().endpoint().join("/completion")?;
