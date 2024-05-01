@@ -49,10 +49,15 @@ struct Completion {
 }
 
 impl Llamafile {
-    pub fn from_path(path: PathBuf) -> Self {
+    pub fn from(path: PathBuf, name: &str, port: u16) -> Self {
         Self {
             config: Config {
                 llamafile_path: path,
+                pid_file: PathBuf::from(format!("/tmp/llm-{}.pid", name)),
+                stdout: PathBuf::from(format!("/tmp/llm-{}.stdout", name)),
+                stderr: PathBuf::from(format!("/tmp/llm-{}.stderr", name)),
+                sock_file: PathBuf::from(format!("/tmp/llm-{}.sock", name)),
+                port,
                 ..Config::default()
             },
         }
