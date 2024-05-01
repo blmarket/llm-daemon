@@ -1,4 +1,3 @@
-use std::error::Error;
 use std::fs::File;
 use std::path::PathBuf;
 use std::process::exit;
@@ -102,8 +101,8 @@ pub trait LlmDaemonCommand<S> {
                                }
                                stream.shutdown().await.expect("failed to close socket");
                            },
-                           _ = tokio::time::sleep(Duration::from_secs(30)) => {
-                               info!("no activity for 30 seconds, closing...");
+                           _ = tokio::time::sleep(Duration::from_secs(15)) => {
+                               info!("no activity for 15 seconds, closing...");
                                break;
                            },
                         }
@@ -140,7 +139,7 @@ pub trait LlmDaemonCommand<S> {
                         panic!("something wrong: {}", err);
                     },
                 };
-                tokio::time::sleep(Duration::from_secs(1)).await;
+                tokio::time::sleep(Duration::from_secs(5)).await;
             }
         }
     }
