@@ -58,7 +58,6 @@ impl Llamafile {
                 stderr: PathBuf::from(format!("/tmp/llm-{}.stderr", name)),
                 sock_file: PathBuf::from(format!("/tmp/llm-{}.sock", name)),
                 port,
-                ..Config::default()
             },
         }
     }
