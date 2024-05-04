@@ -31,15 +31,14 @@ jobs:
         id: cuda-toolkit
         with:
           cuda: '12.4.1'
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
           override: true
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - run: cargo build --release --all-features
-      - run: git config --global --add safe.directory /home/runner/work/llm-daemon/llm-daemon/llama-cpp-low/llama.cpp
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
