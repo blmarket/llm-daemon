@@ -1,6 +1,6 @@
 [package]
 name = "llama_cpp_low"
-version = "0.0.1"
+version = "0.2.10"
 edition = "2021"
 
 [dependencies]
