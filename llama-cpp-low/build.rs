@@ -17,7 +17,7 @@ fn main() {
     
     if env::var("CARGO_CFG_TARGET_OS").unwrap() != "macos" {
         if cuda == "1" {
-            cmake.configure_arg("-DLLAMA_CUBLAS=ON");
+            cmake.configure_arg("-DLLAMA_CUDA=ON");
         }
     }
 
