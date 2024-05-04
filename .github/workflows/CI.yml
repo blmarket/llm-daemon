@@ -23,39 +23,17 @@ jobs:
         platform:
           - runner: ubuntu-latest
             target: x86_64
-        pyver:
-          - "3.10"
     steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - uses: Jimver/cuda-toolkit@v0.2.15
+        id: cuda-toolkit
+        with:
+          cuda: '12.4.1'
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.pyver }}
-
-      - name: Setup Mamba
-        uses: conda-incubator/setup-miniconda@v3.0.4
-        with:
-          activate-environment: "build"
-          python-version: ${{ matrix.pyver }}
-          miniforge-variant: Mambaforge
-          miniforge-version: latest
-          use-mamba: true
-          add-pip-as-python-dependency: true
-          auto-activate-base: false            
-            
-      - name: Install Dependencies
-        env:
-          MAMBA_DOWNLOAD_FAILFAST: "0"
-          MAMBA_NO_LOW_SPEED_LIMIT: "1"
-        run: |
-          mamba install -y 'cuda' -c nvidia/label/cuda-12.4.1
-          python -m pip install build wheel            
-
-      # - uses: Jimver/cuda-toolkit@v0.2.15
-      #   id: cuda-toolkit
-      #   with:
-      #     cuda: '12.4.1'
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
