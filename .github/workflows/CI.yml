@@ -78,6 +78,10 @@ jobs:
           target: ${{ matrix.platform.target }}
           args: --release --out dist --find-interpreter --manifest-path bihyung/Cargo.toml
           sccache: 'true'
+          docker-options: |
+            -v /usr/local/cuda:/usr/local/cuda
+          before-script-linux: |
+            git config --global --add safe.directory /home/runner/work/llm-daemon/llm-daemon/llama-cpp-low/llama.cpp
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
