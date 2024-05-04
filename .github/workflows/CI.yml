@@ -13,7 +13,7 @@ permissions:
   contents: read
 
 env:
-  RUST_LOG=DEBUG
+  RUST_LOG: DEBUG
 
 jobs:
   llm-daemon:
