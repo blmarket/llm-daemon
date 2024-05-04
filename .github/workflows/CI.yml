@@ -108,7 +108,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: publish
-          args: -p llama-cpp-low --token ${{ secrets.CRATES_API_TOKEN }}
+          args: -p llama_cpp_low --token ${{ secrets.CRATES_API_TOKEN }}
       - name: Publish to crates.io
         uses: actions-rs/cargo@v1
         with:
