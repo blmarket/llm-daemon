@@ -119,6 +119,41 @@ impl Daemon {
     }
 }
 
+impl Into<Daemon> for LlamaConfig {
+    fn into(self) -> Daemon {
+        let mut server_path = std::env::current_exe().unwrap();
+        server_path.pop();
+        if server_path.ends_with("deps") {
+            server_path.pop();
+        }
+        server_path.push("server");
+        if !server_path.exists() {
+            panic!("server path not found: {:?}", server_path);
+        }
+        (self, server_path).into()
+    }
+}
+
+impl Into<Daemon> for (LlamaConfig, String) {
+    fn into(self) -> Daemon {
+        let (config, server_path) = self;
+        Daemon {
+            server_path: PathBuf::from(server_path),
+            config,
+        }
+    }
+}
+
+impl Into<Daemon> for (LlamaConfig, PathBuf) {
+    fn into(self) -> Daemon {
+        let (config, server_path) = self;
+        Daemon {
+            server_path,
+            config,
+        }
+    }
+}
+
 impl LlmDaemonCommand<()> for Daemon {
     fn spawn(&self) -> std::io::Result<(tokio::process::Child, ())> {
         Command::new(&self.server_path)
