@@ -1,4 +1,4 @@
-use std::fs::File;
+use std::fs::OpenOptions;
 use std::path::PathBuf;
 use std::process::exit;
 use std::time::Duration;
@@ -21,13 +21,15 @@ pub trait LlmDaemonCommand<S> {
     fn sock_file(&self) -> &PathBuf;
 
     fn fork_daemon(&self) -> anyhow::Result<()> {
-        let stdout: Stdio = File::create(self.stdout())
+        let mut open_opts = OpenOptions::new();
+        open_opts.write(true).create(true).truncate(false);
+        let stdout: Stdio = open_opts.open(self.stdout())
             .map(|v| v.into())
             .unwrap_or_else(|err| {
                 warn!("failed to open stdout: {:?}", err);
                 Stdio::keep()
             });
-        let stderr: Stdio = File::create(self.stderr())
+        let stderr: Stdio = open_opts.open(self.stderr())
             .map(|v| v.into())
             .unwrap_or_else(|err| {
                 warn!("failed to open stderr: {:?}", err);
@@ -43,7 +45,7 @@ pub trait LlmDaemonCommand<S> {
             daemonize::Outcome::Child(res) => {
                 if let Err(err) = res {
                     // Worst code ever! but I have no other way to inspect err
-                    if format!("{}", err) != "unable to lock pid file, errno 11"
+                    if !format!("{}", err).starts_with("unable to lock pid file")
                     {
                         eprintln!("{}", err);
                     }
@@ -102,8 +104,8 @@ pub trait LlmDaemonCommand<S> {
                                }
                                stream.shutdown().await.expect("failed to close socket");
                            },
-                           _ = tokio::time::sleep(Duration::from_secs(15)) => {
-                               info!("no activity for 15 seconds, closing...");
+                           _ = tokio::time::sleep(Duration::from_secs(60)) => {
+                               info!("no activity for 60 seconds, closing...");
                                break;
                            },
                         }
