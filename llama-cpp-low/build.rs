@@ -14,9 +14,11 @@ fn main() {
     }
 
     let mut cmake = cmake::Config::new(&submodule_dir);
-
-    if cuda == "1" {
-        cmake.configure_arg("-DLLAMA_CUBLAS=ON");
+    
+    if env::var("CARGO_CFG_TARGET_OS").unwrap() != "macos" {
+        if cuda == "1" {
+            cmake.configure_arg("-DLLAMA_CUBLAS=ON");
+        }
     }
 
     cmake.profile("Release");

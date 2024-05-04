@@ -9,5 +9,5 @@ edition = "2021"
 cmake = "0.1.50"
 
 [features]
-default = []
+default = ["cuda"]
 cuda = []
