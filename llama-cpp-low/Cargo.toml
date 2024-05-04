@@ -2,6 +2,12 @@
 name = "llama_cpp_low"
 version = "0.3.0"
 edition = "2021"
+license = "MIT"
+keywords = ["llm"]
+description = "small server binary compile build from llama.cpp"
+homepage = "https://github.com/blmarket/llm-daemon"
+repository = "https://github.com/blmarket/llm-daemon"
+readme = "README.md"
 
 [dependencies]
 
