@@ -12,6 +12,9 @@ on:
 permissions:
   contents: read
 
+env:
+  RUST_LOG=DEBUG
+
 jobs:
   llm-daemon:
     runs-on: ${{ matrix.platform.runner }}
