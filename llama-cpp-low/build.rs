@@ -14,15 +14,14 @@ fn main() {
     }
 
     let mut cmake = cmake::Config::new(&submodule_dir);
-    
+
     if env::var("CARGO_CFG_TARGET_OS").unwrap() != "macos" {
         if cuda == "1" {
             cmake.configure_arg("-DLLAMA_CUDA=ON");
         }
     }
 
-    cmake.profile("Release");
-    cmake.build_target("server");
+    cmake.profile("Release").build_target("server");
     let dst = cmake.build();
 
     let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
@@ -30,10 +29,11 @@ fn main() {
     std::fs::copy(
         submodule_dir.join("ggml-metal.metal"),
         out_path.join("../../../ggml-metal.metal"),
-    ).expect("Couldn't copy ggml-metal.metal");
+    )
+    .expect("Couldn't copy ggml-metal.metal");
     std::fs::copy(
         dst.join("build/bin/server"),
         out_path.join("../../../server"),
-    ).expect(&format!("Couldn't copy server from {:?}", dst));
+    )
+    .expect(&format!("Couldn't copy server from {:?}", dst));
 }
-
