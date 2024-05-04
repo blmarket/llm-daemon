@@ -12,9 +12,6 @@ on:
 permissions:
   contents: read
 
-env:
-  RUST_LOG: DEBUG
-
 jobs:
   linux:
     runs-on: ${{ matrix.platform.runner }}
@@ -108,7 +105,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: publish
-          args: -p llama_cpp_low --token ${{ secrets.CRATES_API_TOKEN }}
+          args: -p llama_cpp_low --no-verify --token ${{ secrets.CRATES_API_TOKEN }}
       - name: Publish to crates.io
         uses: actions-rs/cargo@v1
         with:
