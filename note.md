@@ -1,3 +1,15 @@
+## 0.3.0 feature - embed llama.cpp binary
+
+지금은 그냥 llama.cpp를 직접 컴파일한 바이너리 경로를 지정하게 해 뒀는데, 기왕
+daemon 패키지까지 만든 마당에 아예 바이너리를 함께 배포하는건 어떨까 싶다.
+
+기본 cmake로 간단히 빌드를 해 봤고 rust 빌드에선 아마 잘 동작할 거다.
+
+문제는 python 패키지인데, 여기 패키지에 server 바이너리랑 metal 파일을 리소스로
+포함시켜야 할 것 같다. 요거까지 하고 0.3.0으로 판올림하면 적당할듯
+
+---
+
 ## bootstrapping timeout of llm-daemon
 
 알지 못할 이유로 초기 데몬 bootstrap 중에 heartbeat를 받지 못하고 timeout이
