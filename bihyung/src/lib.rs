@@ -1,8 +1,9 @@
 #![allow(non_local_definitions)]
 
 use llm_daemon::{
-    self, llama_config_map, LlamaConfig, LlamaConfigs, LlmConfig as _, LlmDaemon as _, MlcConfig, ProxyConfig
+    self, LlmConfig as _, LlmDaemon as _, MlcConfig, ProxyConfig
 };
+use llm_daemon::daemon::{Daemon, LlamaConfig, LlamaConfigs, llama_config_map};
 use pyo3::prelude::*;
 use pyo3_asyncio::tokio::get_runtime;
 
@@ -45,24 +46,12 @@ pub enum Model {
 
 #[pyclass]
 pub struct LlamaDaemon {
-    inner: llm_daemon::LlamaDaemon,
+    inner: Daemon,
     endpoint: String,
 }
 
 #[pymethods]
 impl LlamaDaemon {
-    #[new]
-    pub fn new() -> Self {
-        let conf = LlamaConfig::default();
-        let endpoint = conf.endpoint();
-        let inner = llm_daemon::LlamaDaemon::new(conf);
-
-        Self {
-            endpoint: endpoint.to_string(),
-            inner,
-        }
-    }
-    
     pub fn fork_daemon(&self) -> PyResult<()> {
         self.inner.fork_daemon().expect("failed to fork daemon");
         Ok(())
@@ -81,18 +70,17 @@ impl LlamaDaemon {
 }
 
 #[pyfunction]
-pub fn daemon_from_model<'a>(model: &'a Model) -> PyResult<LlamaDaemon> {
+pub fn daemon_from_model<'a>(model: &'a Model, server_path: String) -> PyResult<LlamaDaemon> {
     let conf = match model {
         Model::Llama3_8b => llama_config_map()[&LlamaConfigs::Llama3].clone(),
         Model::Phi3_3b => llama_config_map()[&LlamaConfigs::Phi3].clone(),
         Model::Gemma2b => llama_config_map()[&LlamaConfigs::Gemma2b].clone(),
     };
     let endpoint = conf.endpoint();
-    let inner = llm_daemon::LlamaDaemon::new(conf);
-
+    let daemon = (conf, server_path).into();
     Ok(LlamaDaemon {
         endpoint: endpoint.to_string(),
-        inner,
+        inner: daemon,
     })
 }
 
@@ -135,7 +123,7 @@ impl MlcDaemon {
 
 #[pyclass]
 pub struct ProxyDaemon {
-    inner: llm_daemon::Proxy<llm_daemon::LlamaDaemon>,
+    inner: llm_daemon::Proxy<Daemon>,
     endpoint: String,
 }
 
@@ -147,7 +135,7 @@ impl ProxyDaemon {
         let endpoint = conf.endpoint();
         let inner = llm_daemon::Proxy::new(
             conf,
-            llm_daemon::LlamaDaemon::new(LlamaConfig::default()),
+            Daemon::new(LlamaConfig::default()),
         );
 
         Self {
