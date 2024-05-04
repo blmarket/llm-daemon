@@ -48,6 +48,7 @@ impl Default for LlamaConfig {
 pub enum LlamaConfigs {
     Llama3,
     Phi3,
+    Gemma2b,
 }
 
 pub fn llama_config_map() -> &'static HashMap<LlamaConfigs, LlamaConfig> {
@@ -60,10 +61,10 @@ pub fn llama_config_map() -> &'static HashMap<LlamaConfigs, LlamaConfig> {
                 .join("proj/llama.cpp/build/bin/server"),
             model_path: PathBuf::from(env!("HOME"))
                 .join("proj/Meta-Llama-3-8B-Instruct-Q5_K_M.gguf"),
-            pid_file: PathBuf::from("/tmp/llamacpp-llama3.pid"),
-            stdout: PathBuf::from("/tmp/llamacpp-llama3.stdout"),
-            stderr: PathBuf::from("/tmp/llamacpp-llama3.stderr"),
-            sock_file: PathBuf::from("/tmp/llamacpp-llama3.sock"),
+            pid_file: PathBuf::from("/tmp/llama3-llamacpp.pid"),
+            stdout: PathBuf::from("/tmp/llama3-llamacpp.stdout"),
+            stderr: PathBuf::from("/tmp/llama3-llamacpp.stderr"),
+            sock_file: PathBuf::from("/tmp/llama3-llamacpp.sock"),
             port: 28282,
         };
 
@@ -72,16 +73,29 @@ pub fn llama_config_map() -> &'static HashMap<LlamaConfigs, LlamaConfig> {
                 .join("proj/llama.cpp/build/bin/server"),
             model_path: PathBuf::from(env!("HOME"))
                 .join("proj/Phi-3-mini-4k-instruct-q4.gguf"),
-            pid_file: PathBuf::from("/tmp/llamacpp-phi3.pid"),
-            stdout: PathBuf::from("/tmp/llamacpp-phi3.stdout"),
-            stderr: PathBuf::from("/tmp/llamacpp-phi3.stderr"),
-            sock_file: PathBuf::from("/tmp/llamacpp-phi3.sock"),
+            pid_file: PathBuf::from("/tmp/phi3-llamacpp.pid"),
+            stdout: PathBuf::from("/tmp/phi3-llamacpp.stdout"),
+            stderr: PathBuf::from("/tmp/phi3-llamacpp.stderr"),
+            sock_file: PathBuf::from("/tmp/phi3-llamacpp.sock"),
             port: 28283,
+        };
+
+        let gemma2b: LlamaConfig = LlamaConfig {
+            server_path: PathBuf::from(env!("HOME"))
+                .join("proj/llama.cpp/build/bin/server"),
+            model_path: PathBuf::from(env!("HOME"))
+                .join("proj/gemma-2b-it-Q5_K_M.gguf"),
+            pid_file: PathBuf::from("/tmp/gemma2b-llamacpp.pid"),
+            stdout: PathBuf::from("/tmp/gemma2b-llamacpp.stdout"),
+            stderr: PathBuf::from("/tmp/gemma2b-llamacpp.stderr"),
+            sock_file: PathBuf::from("/tmp/gemma2b-llamacpp.sock"),
+            port: 28284,
         };
 
         HashMap::from_iter([
             (LlamaConfigs::Llama3, llama3),
             (LlamaConfigs::Phi3, phi3),
+            (LlamaConfigs::Gemma2b, gemma2b),
         ])
     })
 }
