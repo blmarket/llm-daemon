@@ -24,7 +24,7 @@ jobs:
           - runner: ubuntu-latest
             target: x86_64
         pyver:
-          - 3.10
+          - "3.10"
     steps:
       - uses: actions/checkout@v4
         with:
