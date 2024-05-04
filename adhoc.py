@@ -14,7 +14,10 @@ if module_path not in sys.path:
 
 import maturin_import_hook
 maturin_import_hook.install()
-from bihyung import LlamaDaemon
+from bihyung import LlamaDaemon, Model, daemon_from_model
+
+#%%
+d = daemon_from_model(Model.Gemma2b)
 
 #%%
 d = LlamaDaemon()
@@ -36,5 +39,8 @@ resp = requests.post(d.endpoint(), json = {
     "max_tokens": 128,
 }).json()
 resp["content"]
+
+# %%
+resp
 
 # %%
