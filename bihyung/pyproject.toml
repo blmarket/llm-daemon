@@ -13,4 +13,5 @@ classifiers = [
 dynamic = ["version"]
 
 [tool.maturin]
+profile = "release" # we expect release build `server` bin to be available.
 features = ["pyo3/extension-module"]

@@ -1,0 +1,1 @@
+../../target/release/ggml-metal.metal

@@ -13,10 +13,11 @@ readme = "README.md"
 tracing = { workspace = true }
 anyhow = { workspace = true }
 tokio = { workspace = true }
-axum = "0.7"
-daemonize = "0.5"
 serde = { workspace = true }
 serde_json = { workspace = true }
+llama_cpp_low = { path = "../llama-cpp-low" }
+axum = "0.7"
+daemonize = "0.5"
 futures = "0.3"
 hyper = { version = "1", features = ["full"] }
 hyper-util = { version = "0.1", features = ["full"] }
