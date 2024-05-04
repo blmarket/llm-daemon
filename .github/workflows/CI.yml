@@ -64,9 +64,6 @@ jobs:
           - runner: macos-14
             target: aarch64
     steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
       - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
@@ -74,6 +71,9 @@ jobs:
         with:
           toolchain: nightly
           override: true
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - run: cargo build --release
       - name: Build wheels
         uses: PyO3/maturin-action@v1
@@ -93,10 +93,6 @@ jobs:
     if: "startsWith(github.ref, 'refs/tags/')"
     needs: [linux, macos]
     steps:
-      - uses: Jimver/cuda-toolkit@v0.2.15
-        id: cuda-toolkit
-        with:
-          cuda: '12.4.1'
       - uses: actions/download-artifact@v4
       - name: Publish to PyPI
         uses: PyO3/maturin-action@v1
