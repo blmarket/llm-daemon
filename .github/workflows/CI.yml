@@ -30,7 +30,7 @@ jobs:
           cuda: '12.4.1'
       - uses: actions/checkout@v4
         with:
-          submodules: recursive
+          submodules: true
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
@@ -62,7 +62,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          submodules: recursive
+          submodules: true
       - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
@@ -103,7 +103,7 @@ jobs:
           args: --non-interactive --skip-existing wheels-*/*
       - uses: actions/checkout@v4
         with:
-          submodules: recursive
+          submodules: true
       - name: Publish to crates.io
         uses: actions-rs/cargo@v1
         with:
