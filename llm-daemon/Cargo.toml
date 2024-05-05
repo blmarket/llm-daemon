@@ -1,6 +1,6 @@
 [package]
 name = "llm-daemon"
-version = "0.3.0-14"
+version = "0.3.1-alpha.0"
 edition = "2021"
 license = "GPL-3.0-only"
 keywords = ["llm"]
@@ -15,7 +15,7 @@ anyhow = { workspace = true }
 tokio = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
-llama_cpp_low = { version = "0.3.0-13", path = "../llama-cpp-low" }
+llama_cpp_low = { version = "0.3.1-alpha.0", path = "../llama-cpp-low" }
 axum = "0.7"
 daemonize = "0.5"
 futures = "0.3"
