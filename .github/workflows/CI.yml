@@ -111,6 +111,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+      - run: rm -rf llama-cpp-low/llama.cpp/models
       - name: Publish to crates.io
         uses: actions-rs/cargo@v1
         with:
