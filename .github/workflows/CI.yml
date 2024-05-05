@@ -28,6 +28,8 @@ jobs:
         id: cuda-toolkit
         with:
           cuda: '12.4.1'
+          method: 'network'
+          sub-packages: '["nvcc", "cudart", "cublas", "cublas_dev", "thrust"]'
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
@@ -94,6 +96,8 @@ jobs:
         id: cuda-toolkit
         with:
           cuda: '12.4.1'
+          method: 'network'
+          sub-packages: '["nvcc", "cudart", "cublas", "cublas_dev", "thrust"]'
       - uses: actions/download-artifact@v4
       - name: Publish to PyPI
         uses: PyO3/maturin-action@v1
