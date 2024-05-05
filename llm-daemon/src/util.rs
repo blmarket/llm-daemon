@@ -74,6 +74,7 @@ pub trait LlmDaemonCommand<S> {
                         UnixListener::bind(self.sock_file()).expect("Failed to open socket");
                     let mut sigterms =
                         signal(SignalKind::terminate()).expect("failed to add SIGTERM handler");
+                    let mut idle_secs: i32 = 0;
                     loop {
                         select! {
                            _ = sigterms.recv() => {
@@ -103,10 +104,14 @@ pub trait LlmDaemonCommand<S> {
                                     }
                                }
                                stream.shutdown().await.expect("failed to close socket");
+                               idle_secs = 0;
                            },
-                           _ = tokio::time::sleep(Duration::from_secs(60)) => {
-                               info!("no activity for 60 seconds, closing...");
-                               break;
+                           _ = tokio::time::sleep(Duration::from_secs(10)) => {
+                               idle_secs += 10;
+                               info!(time_to_close = idle_secs >= 60, "no activity for {} seconds", idle_secs);
+                               if idle_secs >= 60 {
+                                   break;
+                               }
                            },
                         }
                     }
