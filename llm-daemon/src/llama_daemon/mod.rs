@@ -1,8 +1,8 @@
-mod daemon_ext;
+pub mod daemon_ext;
 mod llamafile;
 pub mod daemon;
 
-pub use daemon_ext::{llama_config_map, Daemon, LlamaConfig, LlamaConfigs};
+pub use daemon::{llama_config_map, Daemon, LlamaConfig, LlamaConfigs};
 pub use llamafile::{Config as LlamafileConfig, Llamafile};
 
 #[cfg(test)]
