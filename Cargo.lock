@@ -1681,7 +1681,7 @@ dependencies = [
 
 [[package]]
 name = "llm-daemon"
-version = "0.3.0"
+version = "0.3.0-14"
 dependencies = [
  "anyhow",
  "async-trait",
