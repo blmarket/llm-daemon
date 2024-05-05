@@ -108,6 +108,10 @@ jobs:
         with:
           command: upload
           args: --non-interactive --skip-existing wheels-*/*
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          override: true
       - uses: actions/checkout@v4
         with:
           submodules: recursive
