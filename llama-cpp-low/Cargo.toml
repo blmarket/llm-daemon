@@ -8,7 +8,7 @@ description = "small server binary compile build from llama.cpp"
 homepage = "https://github.com/blmarket/llm-daemon"
 repository = "https://github.com/blmarket/llm-daemon"
 readme = "README.md"
-exclude = ["llama.cpp/models"]
+exclude = ["llama.cpp/models/*"]
 
 [dependencies]
 
