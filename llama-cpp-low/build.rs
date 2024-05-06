@@ -32,6 +32,11 @@ fn main() {
     )
     .expect("Couldn't copy ggml-metal.metal");
     std::fs::copy(
+        submodule_dir.join("ggml-common.h"),
+        out_path.join("../../../ggml-common.h"),
+    )
+    .expect("Couldn't copy ggml-metal.metal");
+    std::fs::copy(
         dst.join("build/bin/server"),
         out_path.join("../../../server"),
     )
