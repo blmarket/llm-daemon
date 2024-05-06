@@ -119,6 +119,7 @@ pub trait LlmDaemonCommand<S> {
                     cmd.kill().await.ok();
                 });
                 std::fs::remove_file(self.sock_file()).ok();
+                std::fs::remove_file(self.pid_file()).ok();
                 info!("Server closed");
                 exit(0)
             },
