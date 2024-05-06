@@ -9,7 +9,7 @@ use crate::daemon_trait::LlmConfig;
 use crate::util::LlmDaemonCommand;
 use crate::LlmDaemon;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Config {
     pub llamafile_path: PathBuf,
     pub pid_file: PathBuf,

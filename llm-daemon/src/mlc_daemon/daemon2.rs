@@ -42,7 +42,7 @@ impl Default for DaemonConfig {
 impl LlmConfig for DaemonConfig {
     fn endpoint(&self) -> Url {
         url::Url::parse(&format!(
-            "http://{}:{}/v1/completions",
+            "http://{}:{}/v1",
             self.host, self.port
         ))
         .expect("failed to parse url")
