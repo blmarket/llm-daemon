@@ -1,9 +1,7 @@
-#![allow(non_local_definitions)]
-
 use llm_daemon::{
     self, LlmConfig as _, LlmDaemon as _, MlcConfig, ProxyConfig
 };
-use llm_daemon::daemon::{Daemon, LlamaConfig, LlamaConfigs, llama_config_map};
+use llm_daemon::{LlamaDaemon as Daemon, LlamaConfig, LlamaConfigs, llama_config_map};
 use pyo3::prelude::*;
 use pyo3_asyncio::tokio::get_runtime;
 

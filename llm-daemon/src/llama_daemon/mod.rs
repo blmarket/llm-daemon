@@ -1,6 +1,6 @@
 pub mod daemon_ext;
 mod llamafile;
-pub mod daemon;
+mod daemon;
 
 pub use daemon::{llama_config_map, Daemon, LlamaConfig, LlamaConfigs};
 pub use llamafile::{Config as LlamafileConfig, Llamafile};
@@ -11,7 +11,7 @@ mod tests {
     use tracing_test::traced_test;
 
     use crate::daemon_trait::LlmConfig as _;
-    use crate::daemon::{llama_config_map, LlamaConfigs, Daemon, LlamaConfig};
+    use crate::{llama_config_map, LlamaConfigs, LlamaDaemon as Daemon, LlamaConfig};
     use crate::{Generator, LlmDaemon as _};
 
     #[traced_test]
