@@ -115,7 +115,8 @@ impl Daemon {
     }
 }
 
-impl LlmDaemonCommand<()> for Daemon {
+impl LlmDaemonCommand for Daemon {
+    type State = ();
     fn spawn(&self) -> std::io::Result<(tokio::process::Child, ())> {
         Command::new(self.config.server_path.clone())
             .arg("--port")

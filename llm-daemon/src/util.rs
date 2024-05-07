@@ -13,8 +13,9 @@ use tokio::signal::unix::{signal, SignalKind};
 use tracing::{debug, error, info, trace, warn};
 use tracing_subscriber::util::SubscriberInitExt;
 
-pub trait LlmDaemonCommand<S> {
-    fn spawn(&self) -> std::io::Result<(Child, S)>;
+pub trait LlmDaemonCommand {
+    type State;
+    fn spawn(&self) -> std::io::Result<(Child, Self::State)>;
     fn stdout(&self) -> &PathBuf;
     fn stderr(&self) -> &PathBuf;
     fn pid_file(&self) -> &PathBuf;

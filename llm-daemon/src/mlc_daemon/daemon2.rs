@@ -59,13 +59,14 @@ impl Daemon {
     }
 }
 
-struct State {
+pub struct State {
     // This will keep the tempdir stay alive
     #[allow(unused)]
     temp_dir: TempDir,
 }
 
-impl LlmDaemonCommand<State> for Daemon {
+impl LlmDaemonCommand for Daemon {
+    type State = State;
     fn spawn(&self) -> std::io::Result<(tokio::process::Child, State)> {
         let bootstrap: anyhow::Result<(TempDir, PathBuf)> = (|| {
             let temp_dir = tempfile::tempdir()?;

@@ -154,7 +154,8 @@ impl Into<Daemon> for (LlamaConfig, PathBuf) {
     }
 }
 
-impl LlmDaemonCommand<()> for Daemon {
+impl LlmDaemonCommand for Daemon {
+    type State = ();
     fn spawn(&self) -> std::io::Result<(tokio::process::Child, ())> {
         Command::new(&self.server_path)
             .arg("--port")

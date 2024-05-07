@@ -63,7 +63,8 @@ impl Llamafile {
     }
 }
 
-impl LlmDaemonCommand<()> for Llamafile {
+impl LlmDaemonCommand for Llamafile {
+    type State = ();
     fn spawn(&self) -> std::io::Result<(Child, ())> {
         info!(
             path = self.config.llamafile_path.to_string_lossy().as_ref(),
