@@ -8,9 +8,8 @@ mod tests {
     use tokio::runtime::Builder as RuntimeBuilder;
     use tracing_test::traced_test;
 
+    use super::{MlcConfig, MlcDaemon};
     use crate::daemon_trait::LlmConfig as _;
-    use super::MlcConfig;
-    use super::MlcDaemon;
     use crate::{Generator, LlmDaemon as _};
 
     #[traced_test]
@@ -19,7 +18,7 @@ mod tests {
         let config = MlcConfig::default();
         let url = config.endpoint().join("/v1/completions")?;
         let daemon = MlcDaemon::new(config);
-        
+
         daemon.fork_daemon()?;
 
         let runtime = RuntimeBuilder::new_current_thread()

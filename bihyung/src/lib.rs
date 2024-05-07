@@ -1,7 +1,7 @@
 use llm_daemon::{
-    self, LlmConfig as _, LlmDaemon as _, MlcConfig, ProxyConfig
+    self, llama_config_map, LlamaConfig, LlamaConfigs, LlamaDaemon as Daemon,
+    LlmConfig as _, LlmDaemon as _, MlcConfig, ProxyConfig,
 };
-use llm_daemon::{LlamaDaemon as Daemon, LlamaConfig, LlamaConfigs, llama_config_map};
 use pyo3::prelude::*;
 use pyo3_asyncio::tokio::get_runtime;
 
@@ -68,7 +68,10 @@ impl LlamaDaemon {
 }
 
 #[pyfunction]
-pub fn daemon_from_model<'a>(model: &'a Model, server_path: String) -> PyResult<LlamaDaemon> {
+pub fn daemon_from_model<'a>(
+    model: &'a Model,
+    server_path: String,
+) -> PyResult<LlamaDaemon> {
     let conf = match model {
         Model::Llama3_8b => llama_config_map()[&LlamaConfigs::Llama3].clone(),
         Model::Phi3_3b => llama_config_map()[&LlamaConfigs::Phi3].clone(),
@@ -131,10 +134,8 @@ impl ProxyDaemon {
     pub fn new() -> Self {
         let conf = ProxyConfig::default();
         let endpoint = conf.endpoint();
-        let inner = llm_daemon::Proxy::new(
-            conf,
-            Daemon::new(LlamaConfig::default()),
-        );
+        let inner =
+            llm_daemon::Proxy::new(conf, Daemon::new(LlamaConfig::default()));
 
         Self {
             endpoint: endpoint.to_string(),

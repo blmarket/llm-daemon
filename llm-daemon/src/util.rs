@@ -123,8 +123,10 @@ pub trait LlmDaemonCommand {
                     // Child might be already killed, so ignore the error
                     cmd.kill().await.ok();
                 });
-                let delete_sock_err = std::fs::remove_file(self.sock_file()).err();
-                let delete_pid_err = std::fs::remove_file(self.pid_file()).err();
+                let delete_sock_err =
+                    std::fs::remove_file(self.sock_file()).err();
+                let delete_pid_err =
+                    std::fs::remove_file(self.pid_file()).err();
                 info!(
                     delete_sock_err = format!("{:?}", delete_sock_err),
                     delete_pid_err = format!("{:?}", delete_pid_err),

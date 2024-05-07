@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::env;
+use std::hash::{Hash, Hasher as _};
 use std::path::PathBuf;
 use std::sync::OnceLock;
 
@@ -101,17 +102,40 @@ struct Completion {
     content: String,
 }
 
+fn infer_server_path() -> PathBuf {
+    let mut server_path = std::env::current_exe().unwrap();
+    server_path.pop();
+    if server_path.ends_with("deps") {
+        server_path.pop();
+    }
+    server_path.push("server");
+    server_path
+}
+
+impl From<PathBuf> for Daemon {
+    fn from(model_path: PathBuf) -> Self {
+        let server_path = infer_server_path();
+        let mut hasher = std::hash::DefaultHasher::new();
+        let _ = &model_path.hash(&mut hasher);
+        let port = 9000u16 + (hasher.finish() & 0xff) as u16;
+        Self {
+            server_path,
+            config: LlamaConfig {
+                model_path,
+                port,
+                pid_file: PathBuf::from(format!("/tmp/llm-{}.pid", port)),
+                stdout: PathBuf::from(format!("/tmp/llm-{}.stdout", port)),
+                stderr: PathBuf::from(format!("/tmp/llm-{}.stderr", port)),
+                sock_file: PathBuf::from(format!("/tmp/llm-{}.sock", port)),
+                ..Default::default()
+            },
+        }
+    }
+}
+
 impl Daemon {
     pub fn new(config: LlamaConfig) -> Self {
-        let mut server_path = std::env::current_exe().unwrap();
-        server_path.pop();
-        if server_path.ends_with("deps") {
-            server_path.pop();
-        }
-        server_path.push("server");
-        if !server_path.exists() {
-            panic!("server path not found: {:?}", server_path);
-        }
+        let server_path = infer_server_path();
         Self {
             server_path,
             config,
@@ -211,13 +235,25 @@ impl LlmDaemon for Daemon {
 
 #[cfg(test)]
 mod tests {
-    use crate::LlmDaemon;
+    use std::path::PathBuf;
 
     use super::{llama_config_map, Daemon, LlamaConfigs};
+    use crate::LlmDaemon;
 
     #[test]
     fn launch_daemon() -> anyhow::Result<()> {
-        let daemon = Daemon::new(llama_config_map()[&LlamaConfigs::Gemma2b].clone());
+        let daemon =
+            Daemon::new(llama_config_map()[&LlamaConfigs::Gemma2b].clone());
+        daemon.fork_daemon()?;
+        Ok(())
+    }
+
+    #[test]
+    fn launch_daemon_from_model() -> anyhow::Result<()> {
+        let model_path = PathBuf::from(env!("HOME"))
+            .join("proj/Meta-Llama-3-8B-Instruct-Q5_K_M.gguf");
+        let daemon = Daemon::from(model_path);
+
         daemon.fork_daemon()?;
         Ok(())
     }

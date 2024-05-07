@@ -179,8 +179,7 @@ mod tests {
 
     use crate::daemon_trait::LlmConfig as _;
     use crate::proxy::Proxy;
-    use crate::{Generator, LlmDaemon};
-    use crate::{LlamaDaemon, LlamaConfig};
+    use crate::{Generator, LlamaConfig, LlamaDaemon, LlmDaemon};
 
     #[traced_test]
     #[test]
