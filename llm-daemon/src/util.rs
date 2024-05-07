@@ -24,13 +24,15 @@ pub trait LlmDaemonCommand {
     fn fork_daemon(&self) -> anyhow::Result<()> {
         let mut open_opts = OpenOptions::new();
         open_opts.write(true).create(true).truncate(false);
-        let stdout: Stdio = open_opts.open(self.stdout())
+        let stdout: Stdio = open_opts
+            .open(self.stdout())
             .map(|v| v.into())
             .unwrap_or_else(|err| {
                 warn!("failed to open stdout: {:?}", err);
                 Stdio::keep()
             });
-        let stderr: Stdio = open_opts.open(self.stderr())
+        let stderr: Stdio = open_opts
+            .open(self.stderr())
             .map(|v| v.into())
             .unwrap_or_else(|err| {
                 warn!("failed to open stderr: {:?}", err);
@@ -46,7 +48,8 @@ pub trait LlmDaemonCommand {
             daemonize::Outcome::Child(res) => {
                 if let Err(err) = res {
                     // Worst code ever! but I have no other way to inspect err
-                    if !format!("{}", err).starts_with("unable to lock pid file")
+                    if !format!("{}", err)
+                        .starts_with("unable to lock pid file")
                     {
                         eprintln!("{}", err);
                     }
@@ -120,9 +123,13 @@ pub trait LlmDaemonCommand {
                     // Child might be already killed, so ignore the error
                     cmd.kill().await.ok();
                 });
-                std::fs::remove_file(self.sock_file()).ok();
-                std::fs::remove_file(self.pid_file()).ok();
-                info!("Server closed");
+                let delete_sock_err = std::fs::remove_file(self.sock_file()).err();
+                let delete_pid_err = std::fs::remove_file(self.pid_file()).err();
+                info!(
+                    delete_sock_err = format!("{:?}", delete_sock_err),
+                    delete_pid_err = format!("{:?}", delete_pid_err),
+                    "Server closed"
+                );
                 exit(0)
             },
             daemonize::Outcome::Parent(res) => {
