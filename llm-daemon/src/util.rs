@@ -54,6 +54,7 @@ pub trait LlmDaemonCommand<S> {
                 let _guard = tracing_subscriber::FmtSubscriber::builder()
                     .compact()
                     .with_max_level(tracing::Level::TRACE)
+                    .with_writer(std::io::stderr)
                     .set_default();
                 let runtime = RuntimeBuilder::new_current_thread()
                     .enable_time()
@@ -108,8 +109,8 @@ pub trait LlmDaemonCommand<S> {
                            },
                            _ = tokio::time::sleep(Duration::from_secs(10)) => {
                                idle_secs += 10;
-                               info!(time_to_close = idle_secs >= 60, "no activity for {} seconds", idle_secs);
-                               if idle_secs >= 60 {
+                               info!(time_to_close = idle_secs >= 120, "no activity for {} seconds", idle_secs);
+                               if idle_secs >= 120 {
                                    break;
                                }
                            },
