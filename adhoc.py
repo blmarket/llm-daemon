@@ -35,7 +35,7 @@ import requests
 
 #%%
 resp = requests.post(d.endpoint() + "/completions", json = {
-    "prompt": "<|begin_of_text|>Hello world",
+    "prompt": "<bos>Hello world",
     "n_predict": 128,
     "max_tokens": 128,
 }).json()
