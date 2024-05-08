@@ -282,7 +282,7 @@ checksum = "9475866fec1451be56a3c2400fd081ff546538961565ccb5b7142cbd22bc7a51"
 
 [[package]]
 name = "bihyung"
-version = "0.3.2"
+version = "0.3.3"
 dependencies = [
  "enum_dispatch",
  "futures",
@@ -1675,14 +1675,14 @@ checksum = "01cda141df6706de531b6c46c3a33ecca755538219bd484262fa09410c13539c"
 
 [[package]]
 name = "llama_cpp_low"
-version = "0.3.2"
+version = "0.3.3"
 dependencies = [
  "cmake",
 ]
 
 [[package]]
 name = "llm-daemon"
-version = "0.3.3-dev"
+version = "0.3.3"
 dependencies = [
  "anyhow",
  "async-trait",

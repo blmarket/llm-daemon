@@ -1,6 +1,6 @@
 [package]
 name = "llm-daemon"
-version = "0.3.3-dev"
+version = "0.3.3"
 edition = "2021"
 license = "GPL-3.0-only"
 keywords = ["llm"]
@@ -10,12 +10,12 @@ repository = "https://github.com/blmarket/llm-daemon"
 readme = "README.md"
 
 [dependencies]
+llama_cpp_low = { version = "0.3.3", path = "../llama-cpp-low" }
 tracing = { workspace = true }
 anyhow = { workspace = true }
 tokio = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
-llama_cpp_low = { version = "0.3.2", path = "../llama-cpp-low" }
 axum = "0.7"
 daemonize = "0.5"
 futures = "0.3"
