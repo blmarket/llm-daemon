@@ -2,16 +2,15 @@ use std::time::{Duration, Instant};
 
 use criterion::{criterion_group, criterion_main, Criterion};
 use llm_daemon::{
-    LlamaConfig, LlamaDaemon, LlmConfig as _, LlmDaemon, MlcConfig, MlcDaemon,
-    Proxy, ProxyConfig,
+    llama_config_map, LlamaConfigs, LlamaDaemon, LlmConfig as _, LlmDaemon, MlcConfig, MlcDaemon, Proxy, ProxyConfig
 };
 use tokio::runtime::Builder as RuntimeBuilder;
 use url::Url;
 
 fn llama_config() -> (Url, impl LlmDaemon) {
-    let config = LlamaConfig::default();
+    let config = llama_config_map()[&LlamaConfigs::Llama3].clone();
     let endpoint = config.endpoint();
-    let daemon = LlamaDaemon::new(config);
+    let daemon: LlamaDaemon = config.into();
 
     (endpoint, daemon)
 }

@@ -138,6 +138,7 @@ mod tests {
 
     #[traced_test]
     #[test]
+    #[ignore = "taking too much gpu memory running tests"]
     fn it_works() -> anyhow::Result<()> {
         let inst = Llamafile::from(
             PathBuf::from(std::env!("HOME"))

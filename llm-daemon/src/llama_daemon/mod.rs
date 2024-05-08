@@ -12,16 +12,16 @@ mod tests {
 
     use crate::daemon_trait::LlmConfig as _;
     use crate::{
-        llama_config_map, Generator, LlamaConfig, LlamaConfigs,
+        llama_config_map, Generator, LlamaConfigs,
         LlamaDaemon as Daemon, LlmDaemon as _,
     };
 
     #[traced_test]
     #[test]
     fn it_works() -> anyhow::Result<()> {
-        let config = LlamaConfig::default();
+        let config = llama_config_map()[&LlamaConfigs::Llama3].clone();
         let url = config.endpoint().join("/completion")?;
-        let inst = Daemon::new(config);
+        let inst: Daemon = config.into();
         inst.fork_daemon()?;
 
         let runtime = RuntimeBuilder::new_current_thread()

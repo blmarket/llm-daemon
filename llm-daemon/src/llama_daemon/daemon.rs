@@ -28,20 +28,6 @@ impl LlmConfig for LlamaConfig {
     }
 }
 
-impl Default for LlamaConfig {
-    fn default() -> Self {
-        LlamaConfig {
-            model_path: PathBuf::from(env!("HOME"))
-                .join("proj/Meta-Llama-3-8B-Instruct-Q5_K_M.gguf"),
-            pid_file: PathBuf::from("/tmp/llamacpp-llama3.pid"),
-            stdout: PathBuf::from("/tmp/llamacpp-llama3.stdout"),
-            stderr: PathBuf::from("/tmp/llamacpp-llama3.stderr"),
-            sock_file: PathBuf::from("/tmp/llamacpp-llama3.sock"),
-            port: 28282,
-        }
-    }
-}
-
 #[derive(PartialEq, Eq, Hash)]
 pub enum LlamaConfigs {
     Llama3,
@@ -128,7 +114,6 @@ impl From<PathBuf> for Daemon {
                 stdout: PathBuf::from(format!("/tmp/llm-{}.stdout", port)),
                 stderr: PathBuf::from(format!("/tmp/llm-{}.stderr", port)),
                 sock_file: PathBuf::from(format!("/tmp/llm-{}.sock", port)),
-                ..Default::default()
             },
         }
     }

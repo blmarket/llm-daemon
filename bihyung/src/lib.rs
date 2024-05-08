@@ -125,14 +125,15 @@ pub struct ProxyDaemon {
     endpoint: String,
 }
 
+/// Currently it's not quite tested.
 #[pymethods]
 impl ProxyDaemon {
     #[new]
-    pub fn new() -> Self {
+    pub fn new<'a>(daemon: &'a DaemonHandle) -> Self {
         let conf = ProxyConfig::default();
         let endpoint = conf.endpoint();
         let inner =
-            llm_daemon::Proxy::new(conf, Daemon::new(LlamaConfig::default()));
+            llm_daemon::Proxy::new(conf, daemon.daemon.clone());
 
         Self {
             endpoint: endpoint.to_string(),

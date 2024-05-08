@@ -179,7 +179,7 @@ mod tests {
 
     use crate::daemon_trait::LlmConfig as _;
     use crate::proxy::Proxy;
-    use crate::{Generator, LlamaConfig, LlamaDaemon, LlmDaemon};
+    use crate::{llama_config_map, Generator, LlamaConfigs, LlamaDaemon, LlmDaemon};
 
     #[traced_test]
     #[test]
@@ -187,7 +187,7 @@ mod tests {
         type Target = Proxy<LlamaDaemon>;
         let conf = <Target as LlmDaemon>::Config::default();
         let endpoint = conf.endpoint();
-        let inst = Target::new(conf, LlamaDaemon::new(LlamaConfig::default()));
+        let inst = Target::new(conf, llama_config_map()[&LlamaConfigs::Llama3].clone().into());
 
         inst.fork_daemon()?;
         let runtime = Runtime::new()?;
