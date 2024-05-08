@@ -235,6 +235,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "taking too much memory"]
     fn launch_daemon_from_model() -> anyhow::Result<()> {
         let model_path = PathBuf::from(env!("HOME"))
             .join("proj/Meta-Llama-3-8B-Instruct-Q5_K_M.gguf");
