@@ -1,39 +1,13 @@
+use futures::TryFutureExt as _;
 use llm_daemon::{
     self, llama_config_map, LlamaConfig, LlamaConfigs, LlamaDaemon as Daemon,
     LlmConfig as _, LlmDaemon as _, MlcConfig, ProxyConfig,
 };
+use pyo3::exceptions::PyTypeError;
 use pyo3::prelude::*;
+use pyo3::types::PyType;
 use pyo3_asyncio::tokio::get_runtime;
-
-#[pyclass]
-pub struct Generator {
-    inner: llm_daemon::Generator,
-}
-
-#[pymethods]
-impl Generator {
-    #[new]
-    pub fn new(endpoint: String, model: Option<String>) -> Self {
-        Self {
-            inner: llm_daemon::Generator::new(
-                url::Url::parse(&endpoint).expect("failed to parse url"),
-                model,
-            ),
-        }
-    }
-
-    pub fn generate<'a>(
-        &'a self,
-        py: Python<'a>,
-        prompt: String,
-    ) -> PyResult<&PyAny> {
-        let fut = self.inner.generate(prompt);
-        pyo3_asyncio::tokio::future_into_py(py, async move {
-            let tmp = fut.await;
-            Ok(tmp.expect("failed to get string"))
-        })
-    }
-}
+use tokio::task::JoinHandle;
 
 #[pyclass]
 pub enum Model {
@@ -43,35 +17,57 @@ pub enum Model {
 }
 
 #[pyclass]
-pub struct LlamaDaemon {
-    inner: Daemon,
+pub struct DaemonHandle {
+    daemon: Daemon,
+    handle: Option<JoinHandle<PyResult<()>>>,
     endpoint: String,
 }
 
 #[pymethods]
-impl LlamaDaemon {
-    pub fn fork_daemon(&self) -> PyResult<()> {
-        self.inner.fork_daemon().expect("failed to fork daemon");
-        Ok(())
-    }
-
-    pub fn heartbeat(&self) -> PyResult<()> {
+impl DaemonHandle {
+    pub fn __enter__(&mut self) -> PyResult<()> {
+        self.daemon.fork_daemon().expect("failed to fork daemon");
+        
+        if self.handle.is_some() {
+            panic!("cannot enter twice");
+        }
         let runtime = get_runtime();
-        // FIXME: join later
-        let _handle = runtime.spawn(self.inner.heartbeat());
+        dbg!("beating");
+        let daemon = self.daemon.clone();
+        self.handle = Some(runtime.spawn({
+            daemon
+                .heartbeat()
+                .map_err(|e| PyErr::new::<PyTypeError, _>(e.to_string()))
+        }));
+        
         Ok(())
     }
 
+    pub fn __exit__<'a>(
+        &mut self,
+        _a: Option<&'a PyType>,
+        _b: Option<PyObject>,
+        _c: Option<PyObject>,
+    ) -> PyResult<bool> {
+        dbg!("joining");
+        if self.handle.is_none() {
+            panic!("cannot exit twice");
+        }
+        self.handle.as_mut().unwrap().abort();
+        self.handle = None;
+        Ok(false)
+    }
+    
     pub fn endpoint(&self) -> String {
         self.endpoint.clone()
     }
 }
 
 #[pyfunction]
-pub fn daemon_from_model<'a>(
+pub fn _daemon_from_model<'a>(
     model: &'a Model,
     server_path: String,
-) -> PyResult<LlamaDaemon> {
+) -> PyResult<DaemonHandle> {
     let conf = match model {
         Model::Llama3_8b => llama_config_map()[&LlamaConfigs::Llama3].clone(),
         Model::Phi3_3b => llama_config_map()[&LlamaConfigs::Phi3].clone(),
@@ -79,9 +75,10 @@ pub fn daemon_from_model<'a>(
     };
     let endpoint = conf.endpoint();
     let daemon = (conf, server_path).into();
-    Ok(LlamaDaemon {
+    Ok(DaemonHandle {
         endpoint: endpoint.to_string(),
-        inner: daemon,
+        daemon,
+        handle: None,
     })
 }
 
@@ -171,11 +168,10 @@ fn bihyung(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     // tracing::subscriber::set_global_default(subscriber)
     //     .expect("failed to config logging");
     // info!("This will be logged to stdout");
-    m.add_class::<Generator>()?;
-    m.add_class::<LlamaDaemon>()?;
     m.add_class::<MlcDaemon>()?;
     m.add_class::<ProxyDaemon>()?;
     m.add_class::<Model>()?;
-    m.add_function(wrap_pyfunction!(daemon_from_model, m)?)?;
+    m.add_class::<DaemonHandle>()?;
+    m.add_function(wrap_pyfunction!(_daemon_from_model, m)?)?;
     Ok(())
 }
