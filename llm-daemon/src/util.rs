@@ -113,8 +113,8 @@ pub trait LlmDaemonCommand {
                            },
                            _ = tokio::time::sleep(Duration::from_secs(10)) => {
                                idle_secs += 10;
-                               info!(time_to_close = idle_secs >= 120, "no activity for {} seconds", idle_secs);
-                               if idle_secs >= 120 {
+                               info!(time_to_close = idle_secs >= 30, "no activity for {} seconds", idle_secs);
+                               if idle_secs >= 30 {
                                    break;
                                }
                            },
