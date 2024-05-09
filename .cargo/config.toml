@@ -1,0 +1,2 @@
+[alias]
+vup = "workspaces version --no-git-push --no-individual-tags --force '*'"
