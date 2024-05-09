@@ -1,6 +1,6 @@
 [package]
 name = "llama_cpp_low"
-version = "0.3.3"
+version = "0.3.4-b2822"
 edition = "2021"
 license = "MIT"
 keywords = ["llm"]
