@@ -27,19 +27,18 @@ pub struct DaemonHandle {
 impl DaemonHandle {
     pub fn __enter__(&mut self) -> PyResult<()> {
         self.daemon.fork_daemon().expect("failed to fork daemon");
-        
+
         if self.handle.is_some() {
             panic!("cannot enter twice");
         }
         let runtime = get_runtime();
-        dbg!("beating");
         let daemon = self.daemon.clone();
         self.handle = Some(runtime.spawn({
             daemon
                 .heartbeat()
                 .map_err(|e| PyErr::new::<PyTypeError, _>(e.to_string()))
         }));
-        
+
         Ok(())
     }
 
@@ -49,7 +48,6 @@ impl DaemonHandle {
         _b: Option<PyObject>,
         _c: Option<PyObject>,
     ) -> PyResult<bool> {
-        dbg!("joining");
         if self.handle.is_none() {
             panic!("cannot exit twice");
         }
@@ -57,7 +55,7 @@ impl DaemonHandle {
         self.handle = None;
         Ok(false)
     }
-    
+
     pub fn endpoint(&self) -> String {
         self.endpoint.clone()
     }
@@ -132,8 +130,7 @@ impl ProxyDaemon {
     pub fn new<'a>(daemon: &'a DaemonHandle) -> Self {
         let conf = ProxyConfig::default();
         let endpoint = conf.endpoint();
-        let inner =
-            llm_daemon::Proxy::new(conf, daemon.daemon.clone());
+        let inner = llm_daemon::Proxy::new(conf, daemon.daemon.clone());
 
         Self {
             endpoint: endpoint.to_string(),
@@ -161,14 +158,6 @@ impl ProxyDaemon {
 /// A Python module implemented in Rust.
 #[pymodule]
 fn bihyung(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
-    // // TODO: Allow user to change log level, for debugging?
-    // let subscriber = tracing_subscriber::FmtSubscriber::builder()
-    //     .with_max_level(tracing::Level::WARN)
-    //     .finish();
-
-    // tracing::subscriber::set_global_default(subscriber)
-    //     .expect("failed to config logging");
-    // info!("This will be logged to stdout");
     m.add_class::<MlcDaemon>()?;
     m.add_class::<ProxyDaemon>()?;
     m.add_class::<Model>()?;
