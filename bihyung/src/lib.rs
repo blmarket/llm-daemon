@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use futures::TryFutureExt as _;
 use llm_daemon::{
     self, llama_config_map, LlamaConfig, LlamaConfigs, LlamaDaemon as Daemon,
@@ -72,9 +74,23 @@ pub fn _daemon_from_model<'a>(
         Model::Gemma2b => llama_config_map()[&LlamaConfigs::Gemma2b].clone(),
     };
     let endpoint = conf.endpoint();
-    let daemon = (conf, server_path).into();
+    let daemon: Daemon = (conf, server_path).into();
     Ok(DaemonHandle {
         endpoint: endpoint.to_string(),
+        daemon,
+        handle: None,
+    })
+}
+
+#[pyfunction]
+pub fn _daemon_from_gguf<'a>(
+    model_path: String,
+    server_path: String,
+) -> PyResult<DaemonHandle> {
+    let model_pathbuf = PathBuf::from(model_path);
+    let daemon: Daemon = (model_pathbuf, server_path.into()).into();
+    Ok(DaemonHandle {
+        endpoint: daemon.config().endpoint().to_string(),
         daemon,
         handle: None,
     })
@@ -163,5 +179,6 @@ fn bihyung(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_class::<Model>()?;
     m.add_class::<DaemonHandle>()?;
     m.add_function(wrap_pyfunction!(_daemon_from_model, m)?)?;
+    m.add_function(wrap_pyfunction!(_daemon_from_gguf, m)?)?;
     Ok(())
 }

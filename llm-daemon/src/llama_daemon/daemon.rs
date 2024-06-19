@@ -99,9 +99,8 @@ fn infer_server_path() -> PathBuf {
     server_path
 }
 
-impl From<PathBuf> for Daemon {
-    fn from(model_path: PathBuf) -> Self {
-        let server_path = infer_server_path();
+impl From<(PathBuf, PathBuf)> for Daemon {
+    fn from((model_path, server_path): (PathBuf, PathBuf)) -> Self {
         let mut hasher = std::hash::DefaultHasher::new();
         let _ = &model_path.hash(&mut hasher);
         let port = 9000u16 + (hasher.finish() & 0xff) as u16;
@@ -116,6 +115,13 @@ impl From<PathBuf> for Daemon {
                 sock_file: PathBuf::from(format!("/tmp/llm-{}.sock", port)),
             },
         }
+    }
+}
+
+impl From<PathBuf> for Daemon {
+    fn from(model_path: PathBuf) -> Self {
+        let server_path = infer_server_path();
+        (model_path, server_path).into()
     }
 }
 
@@ -171,7 +177,9 @@ impl LlmDaemonCommand for Daemon {
             .arg("--port")
             .arg(self.config.port.to_string())
             .arg("-ngl")
-            .arg("40")
+            .arg("-1")
+            .arg("--prompt-cache")
+            .arg("prompt_cache")
             .arg("-c")
             .arg("4096")
             .arg("-m")
