@@ -21,7 +21,7 @@ fn main() {
         }
     }
 
-    cmake.profile("Release").build_target("server");
+    cmake.profile("Release").build_target("llama-server");
     let dst = cmake.build();
 
     let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
@@ -37,7 +37,7 @@ fn main() {
     )
     .expect("Couldn't copy ggml-metal.metal");
     std::fs::copy(
-        dst.join("build/bin/server"),
+        dst.join("build/bin/llama-server"),
         out_path.join("../../../server"),
     )
     .expect(&format!("Couldn't copy server from {:?}", dst));
