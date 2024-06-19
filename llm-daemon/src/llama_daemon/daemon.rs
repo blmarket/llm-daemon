@@ -181,7 +181,7 @@ impl LlmDaemonCommand for Daemon {
             .arg("--prompt-cache")
             .arg("prompt_cache")
             .arg("-c")
-            .arg("4096")
+            .arg("8192")
             .arg("-m")
             .arg(&self.config.model_path)
             .kill_on_drop(true)
