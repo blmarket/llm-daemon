@@ -38,13 +38,11 @@ resp = requests.post(inner.endpoint() + "/completions", json = {
 resp["content"]
 
 # %%
-client = OpenAI(base_url = inner.endpoint())
+client = OpenAI(base_url = inner.endpoint(), api_key = "nothing")
 resp = client.completions.create(model = "base", prompt = "<bos>Hello world", max_tokens = 128)
-resp.content
-
-# %%
+print(resp.content)
 resp = client.chat.completions.create(model = "base", messages = [{"role": "user", "content": "Hello world"}])
-resp.choices[0].message.content
+print(resp.choices[0].message.content)
 
 #%%
 # After __exit__, we no longer use the daemon.
