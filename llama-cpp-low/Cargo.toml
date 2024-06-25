@@ -8,6 +8,7 @@ keywords = ["llm"]
 description = "small server binary compile build from llama.cpp"
 readme = "README.md"
 exclude = ["llama.cpp/models/**", "llama.cpp/kompute/**"]
+repository = "https://github.com/blmarket/llm-daemon"
 
 [dependencies]
 
