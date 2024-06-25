@@ -7,6 +7,7 @@ license = "GPL-3.0-only"
 keywords = ["llm"]
 description = "LLM as a daemon"
 readme = "README.md"
+repository = "https://github.com/blmarket/llm-daemon"
 
 [dependencies]
 llama_cpp_low = { version = "0.3.5", path = "../llama-cpp-low" }
