@@ -115,11 +115,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-      - name: Publish llama-cpp-low to crates.io
-        uses: actions-rs/cargo@v1
-        with:
-          command: publish
-          args: -p llama_cpp_low --no-verify --token ${{ secrets.CRATES_API_TOKEN }}
       - name: Publish llm-daemon to crates.io
         uses: actions-rs/cargo@v1
         with:
