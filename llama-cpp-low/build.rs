@@ -26,17 +26,16 @@ fn main() {
 
     let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
 
-    // Need to test with METAL environment
-    // std::fs::copy(
-    //     submodule_dir.join("src/ggml/ggml-metal.metal"),
-    //     out_path.join("../../../ggml-metal.metal"),
-    // )
-    // .expect("Couldn't copy ggml-metal.metal");
-    // std::fs::copy(
-    //     submodule_dir.join("ggml-common.h"),
-    //     out_path.join("../../../ggml-common.h"),
-    // )
-    // .expect("Couldn't copy ggml-common.h");
+    std::fs::copy(
+        submodule_dir.join("build/bin/ggml-metal.metal"),
+        out_path.join("../../../ggml-metal.metal"),
+    )
+    .expect("Couldn't copy ggml-metal.metal");
+    std::fs::copy(
+        submodule_dir.join("build/bin/ggml-common.h"),
+        out_path.join("../../../ggml-common.h"),
+    )
+    .expect("Couldn't copy ggml-common.h");
     std::fs::copy(
         dst.join("build/bin/llama-server"),
         out_path.join("../../../server"),
