@@ -11,7 +11,7 @@ use tokio::runtime::Builder as RuntimeBuilder;
 use tokio::select;
 use tokio::signal::unix::{signal, SignalKind};
 use tracing::{debug, error, info, trace, warn};
-use tracing_subscriber::util::SubscriberInitExt;
+use tracing_subscriber::util::SubscriberInitExt as _;
 
 pub trait LlmDaemonCommand {
     type State;
@@ -56,7 +56,8 @@ pub trait LlmDaemonCommand {
                     exit(0)
                 }
                 let _guard = tracing_subscriber::FmtSubscriber::builder()
-                    .compact()
+                    .pretty()
+                    .with_timer(tracing_subscriber::fmt::time::LocalTime::rfc_3339())
                     .with_max_level(tracing::Level::TRACE)
                     .with_writer(std::io::stderr)
                     .set_default();

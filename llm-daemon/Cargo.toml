@@ -24,7 +24,7 @@ hyper-util = { version = "0.1", features = ["full"] }
 reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
 tempfile = "3"
 url = "2"
-tracing-subscriber = "0.3"
+tracing-subscriber = { version = "0.3", features = ["local-time"] }
 
 [dev-dependencies]
 tracing-test = "0.2"
