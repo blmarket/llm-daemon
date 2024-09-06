@@ -1,3 +1,27 @@
+## Better release with cargo workspaces
+
+```
+cargo workspaces version --force '*'
+git push github main vx.y.z
+```
+
+요렇게 하면 모든 프로젝트의 버전을 한 번에 올릴 수 있습니다. 하는김에 crates.io
+publish도 Github action으로 자동화해 놨으니 이제 버전업만 하고 tag만 push하면 되지
+않을까요?
+
+---
+
+## 0.3.14가 되어서야 정리하는 버전 업데이트 방법
+
+보통 llama.cpp가 업데이트되어있을테니 그거 업데이트 먼저 하고 오세요
+
+```
+cargo workspaces version --no-git-push --no-individual-tags --force '*'
+git push github main vx.y.z
+```
+
+---
+
 ## 0.3.0 feature - embed llama.cpp binary
 
 지금은 그냥 llama.cpp를 직접 컴파일한 바이너리 경로를 지정하게 해 뒀는데, 기왕
@@ -15,19 +39,6 @@ daemon 패키지까지 만든 마당에 아예 바이너리를 함께 배포하�
 알지 못할 이유로 초기 데몬 bootstrap 중에 heartbeat를 받지 못하고 timeout이
 발생하고 있다. 맥북에서 발생하는 걸 발견했는데 리눅스에서도 동일한 문제가
 있는지는 잘 모르겠다.
-
----
-
-## Better release with cargo workspaces
-
-```
-cargo workspaces version --force '*'
-git push github main vx.y.z
-```
-
-요렇게 하면 모든 프로젝트의 버전을 한 번에 올릴 수 있습니다. 하는김에 crates.io
-publish도 Github action으로 자동화해 놨으니 이제 버전업만 하고 tag만 push하면 되지
-않을까요?
 
 ---
 
