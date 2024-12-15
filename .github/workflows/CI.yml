@@ -47,7 +47,7 @@ jobs:
           sccache: 'true'
           manylinux: auto
           docker-options: |
-            -v /usr/local/cuda:/usr/local/cuda -e CMAKE_CUDA_ARCHITECTURES=native -e CUDA_ARCHITECTURES=native -e CUDACXX=/usr/local/cuda/bin/nvcc
+            -v /usr/local/cuda:/usr/local/cuda -e CMAKE_CUDA_ARCHITECTURES=compute_87 -e CUDA_ARCHITECTURES=compute_89 -e CUDACXX=/usr/local/cuda/bin/nvcc
           before-script-linux: |
             git config --global --add safe.directory /home/runner/work/llm-daemon/llm-daemon/llama-cpp-low/llama.cpp
       - name: Upload wheels
