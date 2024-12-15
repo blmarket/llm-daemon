@@ -10,7 +10,7 @@ readme = "README.md"
 repository = "https://github.com/blmarket/llm-daemon"
 
 [dependencies]
-llama_cpp_low = { version = "0.3.12-alpha.0", path = "../llama-cpp-low" }
+llama_cpp_low = { version = "0.3.12-alpha.0", path = "../llama-cpp-low", default-features = false }
 tracing = { workspace = true }
 anyhow = { workspace = true }
 tokio = { workspace = true }
@@ -33,9 +33,10 @@ langchain-rust = "4"
 async-trait = "0.1"
 
 [features]
-default = ["llama-daemon", "mlc-daemon"]
+default = ["llama-daemon", "mlc-daemon", "cuda"]
 llama-daemon = []
 mlc-daemon = []
+cuda = ["llama_cpp_low/cuda"]
 
 [[bench]]
 name = "port_open"
