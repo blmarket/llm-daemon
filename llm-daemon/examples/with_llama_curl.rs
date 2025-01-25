@@ -8,7 +8,7 @@ use llm_daemon::{Daemon2, LlmConfig, LlmDaemon};
 /// Seems the library is quite big so I stepped back from using it.
 fn main() -> anyhow::Result<()> {
     let daemon =
-        Daemon2::from("microsoft/Phi-3-mini-4k-instruct-gguf".to_string());
+        Daemon2::from("ggml-org/Qwen2.5-Coder-14B-Q8_0-GGUF".to_string());
     daemon.fork_daemon()?;
     let runtime = tokio::runtime::Runtime::new()?;
     runtime.spawn(daemon.heartbeat());
