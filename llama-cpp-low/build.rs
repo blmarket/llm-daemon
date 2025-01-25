@@ -14,6 +14,7 @@ fn main() {
     }
 
     let mut cmake = cmake::Config::new(&submodule_dir);
+    cmake.configure_arg("-DLLAMA_CURL=ON");
 
     if env::var("CARGO_CFG_TARGET_OS").unwrap() != "macos" {
         if cuda == "1" {
