@@ -57,7 +57,9 @@ pub trait LlmDaemonCommand {
                 }
                 let _guard = tracing_subscriber::FmtSubscriber::builder()
                     .pretty()
-                    .with_timer(tracing_subscriber::fmt::time::LocalTime::rfc_3339())
+                    .with_timer(
+                        tracing_subscriber::fmt::time::LocalTime::rfc_3339(),
+                    )
                     .with_max_level(tracing::Level::TRACE)
                     .with_writer(std::io::stderr)
                     .set_default();

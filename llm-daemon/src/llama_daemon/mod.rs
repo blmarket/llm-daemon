@@ -12,8 +12,8 @@ mod tests {
 
     use crate::daemon_trait::LlmConfig as _;
     use crate::{
-        llama_config_map, Generator, LlamaConfigs,
-        LlamaDaemon as Daemon, LlmDaemon as _,
+        llama_config_map, Generator, LlamaConfigs, LlamaDaemon as Daemon,
+        LlmDaemon as _,
     };
 
     #[traced_test]

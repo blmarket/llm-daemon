@@ -2,7 +2,8 @@ use std::time::{Duration, Instant};
 
 use criterion::{criterion_group, criterion_main, Criterion};
 use llm_daemon::{
-    llama_config_map, LlamaConfigs, LlamaDaemon, LlmConfig as _, LlmDaemon, MlcConfig, MlcDaemon, Proxy, ProxyConfig
+    llama_config_map, LlamaConfigs, LlamaDaemon, LlmConfig as _, LlmDaemon,
+    MlcConfig, MlcDaemon, Proxy, ProxyConfig,
 };
 use tokio::runtime::Builder as RuntimeBuilder;
 use url::Url;

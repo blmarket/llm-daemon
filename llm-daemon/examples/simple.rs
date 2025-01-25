@@ -1,17 +1,23 @@
+use std::path::PathBuf;
+
 use langchain_rust::language_models::llm::LLM;
 use langchain_rust::language_models::options::CallOptions;
 use langchain_rust::llm::{OpenAI, OpenAIConfig};
 use langchain_rust::schemas::Message;
+use llm_daemon::daemon_ext::Daemon;
 use llm_daemon::{
-    llama_config_map, LlamaConfigs, LlamaDaemon, LlmConfig, LlmDaemon,
+    llama_config_map, LlamaConfigs, LlamaDaemon, LlmConfig, LlmDaemon
 };
 
 /// Even though this example uses langchain_rust, I don't support it for usages.
 /// Seems the library is quite big so I stepped back from using it.
 fn main() -> anyhow::Result<()> {
-    let config = llama_config_map()[&LlamaConfigs::Llama3].clone();
-    let daemon: LlamaDaemon = config.into();
+    let model_path = PathBuf::from(env!("HOME"))
+        .join("proj/qwen2.5-coder-32b-instruct-q4_k_m.gguf");
+    dbg!(&model_path);
+    let daemon = LlamaDaemon::from(model_path);
     daemon.fork_daemon()?;
+    dbg!("1");
     let runtime = tokio::runtime::Runtime::new()?;
     runtime.spawn(daemon.heartbeat());
     runtime.block_on(async {
@@ -36,6 +42,7 @@ fn main() -> anyhow::Result<()> {
         });
         let resp2 = oai2.generate(&[msg1, msg2]).await?;
         assert_eq!(resp2.generation, "15");
+        dbg!(resp2.generation);
 
         Ok(())
     })
