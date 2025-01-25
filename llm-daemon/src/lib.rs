@@ -8,7 +8,7 @@ mod util;
 pub use daemon_trait::{LlmConfig, LlmDaemon};
 #[cfg(feature = "llama-daemon")]
 pub use llama_daemon::{
-    daemon_ext, llama_config_map, Daemon as LlamaDaemon, LlamaConfig,
+    daemon_ext, llama_config_map, Daemon as LlamaDaemon, Daemon2, LlamaConfig,
     LlamaConfigs, Llamafile, LlamafileConfig,
 };
 pub use proxy::{Proxy, ProxyConfig};

@@ -26,6 +26,11 @@ impl LlmConfig for LlamaConfig {
         url::Url::parse(&format!("http://127.0.0.1:{}/v1", self.port))
             .expect("failed to parse url")
     }
+
+    fn health_url(&self) -> url::Url {
+        url::Url::parse(&format!("http://127.0.0.1:{}/health", self.port))
+            .expect("failed to parse url")
+    }
 }
 
 impl Default for LlamaConfig {

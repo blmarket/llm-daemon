@@ -1,8 +1,10 @@
 use futures::Future;
+use tracing::trace;
 use url::Url;
 
 pub trait LlmConfig {
     fn endpoint(&self) -> Url;
+    fn health_url(&self) -> Url;
 }
 
 /// Represents a generic daemon capable of performing background tasks, including spawning itself,
@@ -30,15 +32,16 @@ pub trait LlmDaemon {
 
     fn ready<'a>(&self) -> impl Future<Output = ()> + Send + 'a {
         let client = reqwest::Client::new();
-        let endpoint = self.config().endpoint().clone();
+        let endpoint = self.config().health_url().clone();
         async move {
             loop {
                 let res = client.get(endpoint.as_str()).send().await;
+                trace!("{:?}", &res);
                 match res {
-                    Ok(_) => {
+                    Ok(x) if x.status().is_success() => {
                         break;
                     },
-                    Err(_) => {
+                    _ => {
                         tokio::time::sleep(tokio::time::Duration::from_secs(1))
                             .await;
                     },

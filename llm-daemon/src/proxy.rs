@@ -34,6 +34,14 @@ impl LlmConfig for ProxyConfig {
         ))
         .expect("failed to parse url")
     }
+
+    fn health_url(&self) -> url::Url {
+        url::Url::parse(&format!(
+            "http://127.0.0.1:{}/v1/completions",
+            self.port
+        ))
+        .expect("failed to parse url")
+    }
 }
 
 impl Default for ProxyConfig {

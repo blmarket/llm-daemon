@@ -4,10 +4,7 @@ use langchain_rust::language_models::llm::LLM;
 use langchain_rust::language_models::options::CallOptions;
 use langchain_rust::llm::{OpenAI, OpenAIConfig};
 use langchain_rust::schemas::Message;
-use llm_daemon::daemon_ext::Daemon;
-use llm_daemon::{
-    llama_config_map, LlamaConfigs, LlamaDaemon, LlmConfig, LlmDaemon
-};
+use llm_daemon::{LlamaDaemon, LlmConfig, LlmDaemon};
 
 /// Even though this example uses langchain_rust, I don't support it for usages.
 /// Seems the library is quite big so I stepped back from using it.

@@ -26,6 +26,11 @@ impl LlmConfig for LlamaConfig {
         url::Url::parse(&format!("http://127.0.0.1:{}/v1", self.port))
             .expect("failed to parse url")
     }
+
+    fn health_url(&self) -> url::Url {
+        url::Url::parse(&format!("http://127.0.0.1:{}/health", self.port))
+            .expect("failed to parse url")
+    }
 }
 
 #[derive(PartialEq, Eq, Hash)]
@@ -229,12 +234,8 @@ impl LlmDaemon for Daemon {
 
 #[cfg(test)]
 mod tests {
-    use std::path::PathBuf;
-
-    use tokio::runtime::Builder;
-
     use super::{llama_config_map, Daemon, LlamaConfigs};
-    use crate::{Generator, LlmDaemon};
+    use crate::LlmDaemon;
 
     #[test]
     fn launch_daemon() -> anyhow::Result<()> {
