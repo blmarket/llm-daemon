@@ -3,7 +3,7 @@ use std::time::{Duration, Instant};
 use criterion::{criterion_group, criterion_main, Criterion};
 use llm_daemon::{
     llama_config_map, LlamaConfigs, LlamaDaemon, LlmConfig as _, LlmDaemon,
-    MlcConfig, MlcDaemon, Proxy, ProxyConfig,
+    Proxy, ProxyConfig,
 };
 use tokio::runtime::Builder as RuntimeBuilder;
 use url::Url;
@@ -12,14 +12,6 @@ fn llama_config() -> (Url, impl LlmDaemon) {
     let config = llama_config_map()[&LlamaConfigs::Llama3].clone();
     let endpoint = config.endpoint();
     let daemon: LlamaDaemon = config.into();
-
-    (endpoint, daemon)
-}
-
-fn mlc_config() -> (Url, impl LlmDaemon) {
-    let config = MlcConfig::default();
-    let endpoint = config.endpoint();
-    let daemon = MlcDaemon::new(config);
 
     (endpoint, daemon)
 }
@@ -71,19 +63,6 @@ fn benchmark(c: &mut Criterion) {
             for _i in 0..iters {
                 let start = Instant::now();
                 let _ = time_to_port_open(llama_config);
-                acc += start.elapsed();
-                cleanup();
-            }
-            acc
-        })
-    });
-
-    group.bench_function("mlc_port_open", |b| {
-        b.iter_custom(|iters| {
-            let mut acc = Duration::ZERO;
-            for _i in 0..iters {
-                let start = Instant::now();
-                let _ = time_to_port_open(mlc_config);
                 acc += start.elapsed();
                 cleanup();
             }

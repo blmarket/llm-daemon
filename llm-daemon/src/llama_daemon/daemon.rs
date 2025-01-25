@@ -243,30 +243,4 @@ mod tests {
         daemon.fork_daemon()?;
         Ok(())
     }
-
-    #[test]
-    #[ignore = "taking too much memory"]
-    fn launch_daemon_from_model() -> anyhow::Result<()> {
-        let model_path = PathBuf::from(env!("HOME"))
-            .join("proj/qwen2.5-coder-32b-instruct-q4_k_m.gguf");
-        let daemon = Daemon::from(model_path);
-
-        daemon.fork_daemon()?;
-        let runtime = RuntimeBuilder::new_current_thread()
-            .enable_time()
-            .enable_io()
-            .build()
-            .expect("failed to create runtime");
-
-        runtime.spawn(daemon.heartbeat());
-        runtime.block_on(async {
-            let gen = Generator::new(url, None);
-            let response = gen
-                .generate("<|begin_of_text|>The sum of 7 and 8 is ".to_string())
-                .await;
-            assert!(response.is_ok());
-            assert!(response.unwrap().contains("15"));
-        });
-        Ok(())
-    }
 }
