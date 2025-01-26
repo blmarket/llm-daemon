@@ -52,7 +52,7 @@ jobs:
             -v /usr/local/cuda:/usr/local/cuda -e CMAKE_CUDA_ARCHITECTURES=compute_87 -e CUDA_ARCHITECTURES=compute_89 -e CUDACXX=/usr/local/cuda/bin/nvcc
           before-script-linux: |
             git config --global --add safe.directory /home/runner/work/llm-daemon/llm-daemon/llama-cpp-low/llama.cpp
-            sudo apt update && sudo apt -y install cmake gcc-12 g++-12 libnvidia-compute-565-server curl libcurl4-gnutls-dev
+            apt update && apt -y install cmake gcc-12 g++-12 libnvidia-compute-565-server curl libcurl4-gnutls-dev
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
