@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use futures::TryFutureExt as _;
 use llm_daemon::{
     self, llama_config_map, LlamaConfig, LlamaConfigs, LlamaDaemon as Daemon,
-    LlmConfig as _, LlmDaemon as _, MlcConfig, ProxyConfig,
+    LlmConfig as _, LlmDaemon as _, ProxyConfig,
 };
 use pyo3::exceptions::PyTypeError;
 use pyo3::prelude::*;
@@ -97,43 +97,6 @@ pub fn _daemon_from_gguf<'a>(
 }
 
 #[pyclass]
-pub struct MlcDaemon {
-    inner: llm_daemon::MlcDaemon,
-    endpoint: String,
-}
-
-#[pymethods]
-impl MlcDaemon {
-    #[new]
-    pub fn new() -> Self {
-        let conf = MlcConfig::default();
-        let endpoint = conf.endpoint();
-        let inner = llm_daemon::MlcDaemon::new(conf);
-
-        Self {
-            endpoint: endpoint.to_string(),
-            inner,
-        }
-    }
-
-    pub fn fork_daemon(&self) -> PyResult<()> {
-        self.inner.fork_daemon().expect("failed to fork daemon");
-        Ok(())
-    }
-
-    pub fn heartbeat(&self) -> PyResult<()> {
-        let runtime = get_runtime();
-        // FIXME: join later
-        let _handle = runtime.spawn(self.inner.heartbeat());
-        Ok(())
-    }
-
-    pub fn endpoint(&self) -> String {
-        self.endpoint.clone()
-    }
-}
-
-#[pyclass]
 pub struct ProxyDaemon {
     inner: llm_daemon::Proxy<Daemon>,
     endpoint: String,
@@ -174,7 +137,6 @@ impl ProxyDaemon {
 /// A Python module implemented in Rust.
 #[pymodule]
 fn bihyung(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
-    m.add_class::<MlcDaemon>()?;
     m.add_class::<ProxyDaemon>()?;
     m.add_class::<Model>()?;
     m.add_class::<DaemonHandle>()?;
