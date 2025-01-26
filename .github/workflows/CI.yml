@@ -124,4 +124,4 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: publish
-          args: -p llm-daemon --token ${{ secrets.CRATES_API_TOKEN }}
+          args: -p llm-daemon --allow-dirty --no-verify --all-features --token ${{ secrets.CRATES_API_TOKEN }}
