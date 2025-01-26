@@ -18,7 +18,7 @@ jobs:
     strategy:
       matrix:
         platform:
-          - runner: ubuntu-latest
+          - runner: ubuntu-22.04
             target: x86_64
     steps:
       - uses: actions/setup-python@v5
@@ -27,10 +27,12 @@ jobs:
       - uses: Jimver/cuda-toolkit@v0.2.19
         id: cuda-toolkit
         with:
-          cuda: '12.6.1'
+          cuda: '12.4.1'
           method: 'network'
           sub-packages: '["nvcc", "cudart"]'
           non-cuda-sub-packages: '["libcublas","libcublas-dev","libcufft"]'  
+      - name: Install cmake
+        run: sudo apt update && sudo apt -y install cmake gcc-12 g++-12 libnvidia-compute-565-server
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
