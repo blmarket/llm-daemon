@@ -32,7 +32,7 @@ jobs:
           sub-packages: '["nvcc", "cudart"]'
           non-cuda-sub-packages: '["libcublas","libcublas-dev","libcufft"]'  
       - name: Install cmake
-        run: sudo apt update && sudo apt -y install cmake gcc-12 g++-12 libnvidia-compute-565-server
+        run: sudo apt update && sudo apt -y install cmake gcc-12 g++-12 libnvidia-compute-565-server curl
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
