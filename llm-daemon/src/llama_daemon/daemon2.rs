@@ -76,6 +76,23 @@ impl From<String> for Daemon {
     }
 }
 
+impl From<(String, u16)> for Daemon {
+    fn from(params: (String, u16)) -> Self {
+        let (hf_repo, port) = params;
+        Self {
+            server_path: infer_server_path(),
+            hf_repo,
+            config: LlamaConfig {
+                port,
+                pid_file: PathBuf::from(format!("/tmp/llm-{}.pid", port)),
+                stdout: PathBuf::from(format!("/tmp/llm-{}.stdout", port)),
+                stderr: PathBuf::from(format!("/tmp/llm-{}.stderr", port)),
+                sock_file: PathBuf::from(format!("/tmp/llm-{}.sock", port)),
+            },
+        }
+    }
+}
+
 impl LlmDaemonCommand for Daemon {
     type State = ();
     fn spawn(&self) -> std::io::Result<(tokio::process::Child, ())> {
