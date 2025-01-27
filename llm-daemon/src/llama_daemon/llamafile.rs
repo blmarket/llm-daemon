@@ -125,9 +125,11 @@ impl LlmDaemon for Llamafile {
     where
         'a: 'b,
     {
-        let rr = self;
-        let ret = LlmDaemonCommand::heartbeat(rr);
-        ret
+        LlmDaemonCommand::heartbeat(self)
+    }
+
+    fn ping(&self) -> anyhow::Result<()> {
+        LlmDaemonCommand::ping(self)
     }
 }
 

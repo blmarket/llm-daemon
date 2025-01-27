@@ -129,6 +129,10 @@ impl LlmDaemon for Daemon {
     {
         LlmDaemonCommand::heartbeat(self)
     }
+
+    fn ping(&self) -> anyhow::Result<()> {
+        LlmDaemonCommand::ping(self)
+    }
 }
 
 #[cfg(test)]

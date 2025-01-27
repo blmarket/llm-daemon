@@ -24,12 +24,18 @@ pub trait LlmDaemon {
     /// Daemon is expected to terminate if there's no heartbeat for a certain period of time.
     /// Keeping this task within async runtime will ensure that the daemon is kept running
     /// during the application.
+    /// FIXME: Extract heartbeat / ready to Async util?
     fn heartbeat<'a, 'b>(
         &'b self,
     ) -> impl Future<Output = anyhow::Result<()>> + Send + 'a
     where
         'a: 'b;
 
+    /// Send a single heartbeat to let daemon know there is a client.
+    /// Can be useful if you don't want to use heartbeat.
+    fn ping(&self) -> anyhow::Result<()>;
+
+    /// FIXME: Extract heartbeat / ready to Async util?
     fn ready<'a>(&self) -> impl Future<Output = ()> + Send + 'a {
         let client = reqwest::Client::new();
         let endpoint = self.config().health_url().clone();

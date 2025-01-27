@@ -1,4 +1,5 @@
 use std::fs::OpenOptions;
+use std::io::Write;
 use std::path::PathBuf;
 use std::process::exit;
 use std::time::Duration;
@@ -6,6 +7,7 @@ use std::time::Duration;
 use daemonize::{Daemonize, Stdio};
 use tokio::io::AsyncWriteExt as _;
 use tokio::net::{UnixListener, UnixStream};
+// use tokio::net::{UnixListener, UnixStream};
 use tokio::process::Child;
 use tokio::runtime::Builder as RuntimeBuilder;
 use tokio::select;
@@ -141,6 +143,13 @@ pub trait LlmDaemonCommand {
                 res.expect("parent should have no problem");
             },
         };
+        Ok(())
+    }
+
+    fn ping(&self) -> anyhow::Result<()> {
+        let sock_file = self.sock_file().clone();
+        let mut stream = std::os::unix::net::UnixStream::connect(&sock_file)?;
+        stream.write(&[0])?;
         Ok(())
     }
 

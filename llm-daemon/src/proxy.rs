@@ -95,6 +95,10 @@ impl<D: LlmDaemon> LlmDaemon for Proxy<D> {
     fn config(&self) -> &Self::Config {
         &self.config
     }
+
+    fn ping(&self) -> anyhow::Result<()> {
+        self.inner.ping()
+    }
 }
 
 async fn inner(
