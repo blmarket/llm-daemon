@@ -95,15 +95,25 @@ impl From<(String, u16)> for Daemon {
 
 impl LlmDaemonCommand for Daemon {
     type State = ();
+
     fn spawn(&self) -> std::io::Result<(tokio::process::Child, ())> {
+        // Below parameters are referenced from
+        // https://github.com/ggml-org/llama.vim
         Command::new(&self.server_path)
             .arg("--port")
             .arg(self.config.port.to_string())
             .arg("-ngl")
-            .arg("200")
-            .arg("-c")
-            .arg("8192")
-            .arg("--hf-repo")
+            .arg("99")
+            .arg("-fa")
+            .arg("-ub")
+            .arg("1024")
+            .arg("-b")
+            .arg("1024")
+            .arg("--ctx-size")
+            .arg("0")
+            .arg("--cache-reuse")
+            .arg("256")
+            .arg("-hf")
             .arg(&self.hf_repo)
             .kill_on_drop(true)
             .spawn()
