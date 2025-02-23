@@ -183,8 +183,6 @@ impl LlmDaemonCommand for Daemon {
             .arg(self.config.port.to_string())
             .arg("-ngl")
             .arg("200")
-            .arg("--prompt-cache")
-            .arg("prompt_cache")
             .arg("-c")
             .arg("8192")
             .arg("-m")
