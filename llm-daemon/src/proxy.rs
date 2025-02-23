@@ -1,10 +1,11 @@
+use std::fmt::Debug;
 use std::sync::Arc;
 
-use axum::body::BodyDataStream;
+use axum::body::{Body, BodyDataStream};
 use axum::extract::State;
 use axum::http::HeaderValue;
 use axum::response::IntoResponse;
-use axum::routing::post;
+use axum::routing::{get, post};
 use axum::Router;
 use futures::FutureExt;
 use hyper::body::Incoming;
@@ -17,11 +18,12 @@ use serde_json::json;
 use tokio::net::TcpListener;
 use tokio::sync::Semaphore;
 use tokio::time::Instant;
-use tracing::{debug, warn};
+use tracing::{debug, info, warn};
 
 use crate::daemon_trait::LlmConfig;
 use crate::LlmDaemon;
 
+#[derive(Debug)]
 pub struct ProxyConfig {
     port: u16,
 }
@@ -36,11 +38,8 @@ impl LlmConfig for ProxyConfig {
     }
 
     fn health_url(&self) -> url::Url {
-        url::Url::parse(&format!(
-            "http://127.0.0.1:{}/v1/completions",
-            self.port
-        ))
-        .expect("failed to parse url")
+        url::Url::parse(&format!("http://127.0.0.1:{}/health", self.port))
+            .expect("failed to parse url")
     }
 }
 
@@ -50,12 +49,17 @@ impl Default for ProxyConfig {
     }
 }
 
-pub struct Proxy<D: LlmDaemon> {
+/// A proxy to actual LLM server, and only send the last pending request.
+/// If the LLM generation is slower than requests, then processing the oldest
+/// request does not make sense, as the user is more interested in the later
+/// requests. But current server (AFAIK) does not handle this properly...
+#[derive(Debug)]
+pub struct Proxy<D: LlmDaemon + Debug> {
     config: ProxyConfig,
     inner: D,
 }
 
-impl<D: LlmDaemon> Proxy<D> {
+impl<D: LlmDaemon + Debug> Proxy<D> {
     pub fn new(config: ProxyConfig, inner: D) -> Self {
         Self { config, inner }
     }
@@ -66,10 +70,11 @@ struct Completion {
     content: String,
 }
 
-impl<D: LlmDaemon> LlmDaemon for Proxy<D> {
+impl<D: LlmDaemon + Debug> LlmDaemon for Proxy<D> {
     type Config = ProxyConfig;
 
     fn fork_daemon(&self) -> anyhow::Result<()> {
+        info!("Fork inner daemon {:?}", self.inner);
         self.inner.fork_daemon()
     }
 
@@ -101,6 +106,28 @@ impl<D: LlmDaemon> LlmDaemon for Proxy<D> {
     }
 }
 
+async fn handle_health(
+    State((_sem, client)): State<(
+        Arc<Semaphore>,
+        Client<HttpConnector, BodyDataStream>,
+    )>,
+) -> Result<impl IntoResponse, StatusCode> {
+    let req_builder = hyper::Request::builder()
+        .uri("http://127.0.0.1:28282/health")
+        .method("GET");
+
+    let request = req_builder.body(Body::empty().into_data_stream()).unwrap();
+
+    client.request(request).await.map_err(|e| {
+        warn!("error: {} {}", e, e.is_connect());
+        if e.is_connect() {
+            StatusCode::SERVICE_UNAVAILABLE
+        } else {
+            StatusCode::INTERNAL_SERVER_ERROR
+        }
+    })
+}
+
 async fn inner(
     client: &Client<HttpConnector, BodyDataStream>,
     req: axum::extract::Request,
@@ -128,6 +155,7 @@ async fn handle_proxy(
     )>,
     req: axum::extract::Request,
 ) -> Result<impl IntoResponse, StatusCode> {
+    info!("Processing request {:?}", req);
     let clock = Instant::now();
     let acquired = sem
         .clone()
@@ -170,7 +198,9 @@ pub async fn run_proxy(port: u16) -> anyhow::Result<()> {
     let app = Router::new()
         .route("/completions", post(handle_proxy))
         .route("/v1/completions", post(handle_proxy))
+        .route("/health", get(handle_health))
         .with_state((Arc::new(Semaphore::new(1)), client));
+    debug!("Creating listener on {}", port);
     let listener = TcpListener::bind(format!("127.0.0.1:{}", port)).await?;
 
     axum::serve(listener, app).await?;
@@ -191,19 +221,20 @@ mod tests {
 
     use crate::daemon_trait::LlmConfig as _;
     use crate::proxy::Proxy;
-    use crate::{
-        llama_config_map, Generator, LlamaConfigs, LlamaDaemon, LlmDaemon,
-    };
+    use crate::{Daemon2, Generator, LlmDaemon};
 
     #[traced_test]
     #[test]
     fn proxy_trait_test() -> anyhow::Result<()> {
-        type Target = Proxy<LlamaDaemon>;
+        type Target = Proxy<Daemon2>;
         let conf = <Target as LlmDaemon>::Config::default();
         let endpoint = conf.endpoint();
         let inst = Target::new(
             conf,
-            llama_config_map()[&LlamaConfigs::Llama3].clone().into(),
+            crate::Daemon2::from((
+                "ggml-org/Qwen2.5-Coder-3B-Q8_0-GGUF".to_string(),
+                28282,
+            )),
         );
 
         inst.fork_daemon()?;
@@ -211,7 +242,6 @@ mod tests {
         runtime.spawn(inst.heartbeat());
         runtime.block_on(async {
             inst.ready().await;
-            tokio::time::sleep(Duration::from_millis(1000)).await;
             let gen = Generator::new(endpoint, None);
             let resp = gen
                 .generate("<bos>Sum of 7 and 8 is ".to_string())

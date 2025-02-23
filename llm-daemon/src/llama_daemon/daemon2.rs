@@ -30,7 +30,7 @@ impl LlmConfig for LlamaConfig {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Daemon {
     server_path: PathBuf,
     hf_repo: String,

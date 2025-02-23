@@ -21,7 +21,7 @@ mod tests {
     #[traced_test]
     #[test]
     fn it_works() -> anyhow::Result<()> {
-        let config = llama_config_map()[&LlamaConfigs::Llama3].clone();
+        let config = llama_config_map()[&LlamaConfigs::Gemma2b].clone();
         let url = config.endpoint().join("/completion")?;
         let inst: Daemon = config.into();
         inst.fork_daemon()?;
@@ -34,6 +34,7 @@ mod tests {
 
         runtime.spawn(inst.heartbeat());
         runtime.block_on(async {
+            inst.ready().await;
             let gen = Generator::new(url, None);
             let response = gen
                 .generate("<|begin_of_text|>The sum of 7 and 8 is ".to_string())
@@ -45,6 +46,7 @@ mod tests {
     }
 
     #[traced_test]
+    #[ignore = "model is not available in my devenv"]
     #[test]
     fn it_works_with_phi3() -> anyhow::Result<()> {
         let config = llama_config_map()[&LlamaConfigs::Phi3].clone();

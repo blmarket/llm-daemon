@@ -83,7 +83,7 @@ pub fn llama_config_map() -> &'static HashMap<LlamaConfigs, LlamaConfig> {
     })
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Daemon {
     server_path: PathBuf,
     config: LlamaConfig,

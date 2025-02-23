@@ -1,5 +1,5 @@
 use futures::Future;
-use tracing::trace;
+use tracing::{debug, info};
 use url::Url;
 
 pub trait LlmConfig {
@@ -41,8 +41,9 @@ pub trait LlmDaemon {
         let endpoint = self.config().health_url().clone();
         async move {
             loop {
+                debug!("Checking healthcheck endpoint: {}", endpoint.as_str());
                 let res = client.get(endpoint.as_str()).send().await;
-                trace!("{:?}", &res);
+                info!("{:?}", &res);
                 match res {
                     Ok(x) if x.status().is_success() => {
                         break;

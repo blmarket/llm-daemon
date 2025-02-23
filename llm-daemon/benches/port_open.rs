@@ -1,3 +1,4 @@
+use std::fmt::Debug;
 use std::time::{Duration, Instant};
 
 use criterion::{criterion_group, criterion_main, Criterion};
@@ -8,7 +9,7 @@ use llm_daemon::{
 use tokio::runtime::Builder as RuntimeBuilder;
 use url::Url;
 
-fn llama_config() -> (Url, impl LlmDaemon) {
+fn llama_config() -> (Url, impl LlmDaemon + Debug) {
     let config = llama_config_map()[&LlamaConfigs::Llama3].clone();
     let endpoint = config.endpoint();
     let daemon: LlamaDaemon = config.into();
@@ -16,7 +17,7 @@ fn llama_config() -> (Url, impl LlmDaemon) {
     (endpoint, daemon)
 }
 
-fn proxy_config() -> (Url, impl LlmDaemon) {
+fn proxy_config() -> (Url, impl LlmDaemon + Debug) {
     let config = ProxyConfig::default();
     let endpoint = config.endpoint();
     let daemon = Proxy::new(config, llama_config().1);

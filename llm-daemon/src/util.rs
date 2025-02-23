@@ -4,7 +4,7 @@ use std::path::PathBuf;
 use std::process::exit;
 use std::time::Duration;
 
-use daemonize::{Daemonize, Stdio};
+use daemonize::Daemonize;
 use tokio::io::AsyncWriteExt as _;
 use tokio::net::{UnixListener, UnixStream};
 // use tokio::net::{UnixListener, UnixStream};
@@ -12,7 +12,7 @@ use tokio::process::Child;
 use tokio::runtime::Builder as RuntimeBuilder;
 use tokio::select;
 use tokio::signal::unix::{signal, SignalKind};
-use tracing::{debug, error, info, trace, warn};
+use tracing::{debug, error, info, trace};
 use tracing_subscriber::util::SubscriberInitExt as _;
 
 pub trait LlmDaemonCommand {
@@ -26,20 +26,12 @@ pub trait LlmDaemonCommand {
     fn fork_daemon(&self) -> anyhow::Result<()> {
         let mut open_opts = OpenOptions::new();
         open_opts.write(true).create(true).truncate(false);
-        let stdout: Stdio = open_opts
+        let stdout = open_opts
             .open(self.stdout())
-            .map(|v| v.into())
-            .unwrap_or_else(|err| {
-                warn!("failed to open stdout: {:?}", err);
-                Stdio::keep()
-            });
-        let stderr: Stdio = open_opts
+            .expect("failed to open stdout file");
+        let stderr = open_opts
             .open(self.stderr())
-            .map(|v| v.into())
-            .unwrap_or_else(|err| {
-                warn!("failed to open stderr: {:?}", err);
-                Stdio::keep()
-            });
+            .expect("failed to open stderr file");
 
         let daemon = Daemonize::new()
             .pid_file(self.pid_file())
