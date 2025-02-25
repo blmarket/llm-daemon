@@ -16,7 +16,7 @@ anyhow = { workspace = true }
 tokio = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
-axum = "0.7"
+axum = "0.8"
 daemonize = "0.5"
 futures = "0.3"
 hyper = { version = "1", features = ["full"] }
@@ -33,10 +33,27 @@ langchain-rust = "4"
 async-trait = "0.1"
 
 [features]
-default = ["llama-daemon"]
+default = ["llama-daemon", "proxy"]
 llama-daemon = []
 cuda = ["llama_cpp_low/cuda"]
+proxy = []
 
 [[bench]]
 name = "port_open"
 harness = false    
+
+[[example]]
+name = "langchain_llama"
+required-features = ["llama-daemon"]
+
+[[example]]
+name = "llamafile_daemon"
+required-features = ["llama-daemon"]
+
+[[example]]
+name = "with_llama_curl"
+required-features = ["llama-daemon"]
+
+[[example]]
+name = "simple"
+required-features = ["llama-daemon"]
