@@ -209,6 +209,7 @@ pub async fn run_proxy(port: u16) -> anyhow::Result<()> {
 }
 
 #[cfg(test)]
+#[cfg(feature = "llama-daemon")]
 mod tests {
     use std::sync::Arc;
     use std::time::Duration;
