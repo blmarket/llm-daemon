@@ -1,3 +1,47 @@
+## Let's create an example where proxy is working as expected
+
+At this point it's hard to tell whether the proxy is really worth. Would be
+nice to have an example to showcase the proxy.
+
+Goal: Run server with/without proxy. run multiple requests, and show their
+process order and time.
+
+---
+
+## Separate proxy to be a feature
+
+Even though it's a useless yak shaving, I found proxy to be an optional feature
+of the crate.
+
+May need to draft some nice description of proxy feature...
+
+Belos is the draft of the description.
+
+### Last-In-First-Out proxy to the llama.cpp server
+
+Problem: When code generation requests are congested, the usual server will
+respond to the requests in the order they are received.
+
+Although this can work for most of the cases, there are cases where the old
+request is no longer relevant, because the user updated their prompt to a newer
+version. When server has multiple pending requests, it's the best to process the
+newest request first.
+
+This proxy address that concern by properly hold the request connection, and
+discard the request when the request connection is dropped by the client.
+
+---
+
+## Fix proxy to work well with latest llama.cpp
+
+Previously it was possible to make health check by `GET /completions`, but it
+seems more recent version responds with 405 method not allowed error for GET
+request (it should be POST obviously)
+
+Fixed it by replacing the health check endpoint of the proxy to be `GET /health`
+
+---
+
 ## Better release with cargo workspaces
 
 ```

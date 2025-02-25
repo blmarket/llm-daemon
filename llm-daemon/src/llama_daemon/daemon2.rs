@@ -1,3 +1,4 @@
+use std::borrow::Borrow;
 use std::hash::{Hash, Hasher as _};
 use std::path::PathBuf;
 
@@ -35,6 +36,12 @@ pub struct Daemon {
     server_path: PathBuf,
     hf_repo: String,
     config: LlamaConfig,
+}
+
+impl Daemon {
+    fn server_path(&self) -> &PathBuf {
+        &self.server_path
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -93,13 +100,13 @@ impl From<(String, u16)> for Daemon {
     }
 }
 
-impl LlmDaemonCommand for Daemon {
+impl<T: Borrow<Daemon>> LlmDaemonCommand for T {
     type State = ();
 
     fn spawn(&self) -> std::io::Result<(tokio::process::Child, ())> {
         // Below parameters are referenced from
         // https://github.com/ggml-org/llama.vim
-        Command::new(&self.server_path)
+        Command::new(&self.borrow().server_path())
             .arg("--port")
             .arg(self.config.port.to_string())
             .arg("-ngl")
