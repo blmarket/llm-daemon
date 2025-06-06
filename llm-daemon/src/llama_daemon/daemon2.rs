@@ -38,12 +38,6 @@ pub struct Daemon {
     config: LlamaConfig,
 }
 
-impl Daemon {
-    fn server_path(&self) -> &PathBuf {
-        &self.server_path
-    }
-}
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct Completion {
     content: String,
@@ -106,9 +100,9 @@ impl<T: Borrow<Daemon>> LlmDaemonCommand for T {
     fn spawn(&self) -> std::io::Result<(tokio::process::Child, ())> {
         // Below parameters are referenced from
         // https://github.com/ggml-org/llama.vim
-        Command::new(&self.borrow().server_path())
+        Command::new(&self.borrow().server_path)
             .arg("--port")
-            .arg(self.config.port.to_string())
+            .arg(self.borrow().config.port.to_string())
             .arg("-ngl")
             .arg("99")
             .arg("-fa")
@@ -121,26 +115,26 @@ impl<T: Borrow<Daemon>> LlmDaemonCommand for T {
             .arg("--cache-reuse")
             .arg("256")
             .arg("-hf")
-            .arg(&self.hf_repo)
+            .arg(&self.borrow().hf_repo)
             .kill_on_drop(true)
             .spawn()
             .map(|c| (c, ()))
     }
 
     fn stdout(&self) -> &PathBuf {
-        &self.config.stdout
+        &self.borrow().config.stdout
     }
 
     fn stderr(&self) -> &PathBuf {
-        &self.config.stderr
+        &self.borrow().config.stderr
     }
 
     fn pid_file(&self) -> &PathBuf {
-        &self.config.pid_file
+        &self.borrow().config.pid_file
     }
 
     fn sock_file(&self) -> &PathBuf {
-        &self.config.sock_file
+        &self.borrow().config.sock_file
     }
 }
 
