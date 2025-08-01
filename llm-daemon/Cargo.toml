@@ -46,9 +46,6 @@ harness = false
 name = "langchain_llama"
 required-features = ["llama-daemon"]
 
-[[example]]
-name = "llamafile_daemon"
-required-features = ["llama-daemon"]
 
 [[example]]
 name = "with_llama_curl"
@@ -57,3 +54,7 @@ required-features = ["llama-daemon"]
 [[example]]
 name = "simple"
 required-features = ["llama-daemon"]
+
+[[example]]
+name = "qwen3-coder"
+required-features = ["llama-daemon", "cuda"]

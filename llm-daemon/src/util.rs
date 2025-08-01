@@ -152,6 +152,7 @@ pub trait LlmDaemonCommand {
         'a: 'b,
     {
         let sock_file = self.sock_file().clone();
+        info!("Starting heartbeat for {}", sock_file.display());
         async move {
             loop {
                 trace!("Running scheduled loop");
