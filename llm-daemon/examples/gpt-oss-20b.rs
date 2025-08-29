@@ -9,27 +9,20 @@ use std::time::Duration;
 /// Seems the library is quite big so I stepped back from using it.
 fn main() -> anyhow::Result<()> {
     let daemon = Daemon::new(
-        "unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:Q3_K_XL".to_string(),
+        "ggml-org/gpt-oss-20b-GGUF:Q4_K_M".to_string(),
         vec![
             "--jinja".to_string(),
-            "--chat-template-file".to_string(),
-            "/srv/llm-daemon/llm-daemon/chat_template.jinja".to_string(),
             "-ngl".to_string(),
             "99".to_string(),
+            "-fa".to_string(),
             "--threads".to_string(),
             "-1".to_string(),
             "--ctx-size".to_string(),
-            "32684".to_string(),
-            "--temp".to_string(),
-            "0.7".to_string(),
-            "--min-p".to_string(),
-            "0.0".to_string(),
-            "--top-p".to_string(),
-            "0.80".to_string(),
-            "--top-k".to_string(),
-            "20".to_string(),
-            "--repeat-penalty".to_string(),
-            "1.05".to_string(),
+            "131072".to_string(),
+            "-ub".to_string(),
+            "2048".to_string(),
+            "-b".to_string(),
+            "2048".to_string(),
         ],
     );
     daemon.fork_daemon()?;
@@ -44,13 +37,13 @@ fn main() -> anyhow::Result<()> {
                 .with_api_base(daemon.config().endpoint().to_string()),
         );
         let msg0 = Message::new_human_message(
-            "Which model are you? Which company created the model?",
+            "Which model are you? What are your capabilities?",
         );
         let resp1 = oai.generate(&[msg0]).await?;
         dbg!(resp1);
 
-        let msg1 = Message::new_human_message("What is the sum of 7 and 8?");
-        let msg2 = Message::new_ai_message("The sum of 7 and 8 is ");
+        let msg1 = Message::new_human_message("What is the sum of 17 and 23?");
+        let msg2 = Message::new_ai_message("The sum of 17 and 23 is ");
         let mut oai2 = oai.clone();
         oai2.add_options(CallOptions {
             max_tokens: Some(20),
@@ -59,7 +52,7 @@ fn main() -> anyhow::Result<()> {
         });
         let resp2 = oai2.generate(&[msg1, msg2]).await?;
         dbg!(&resp2.generation);
-        assert!(resp2.generation.to_string().contains("15"));
+        assert!(resp2.generation.to_string().contains("40"));
 
         dbg!(daemon.config().endpoint().to_string());
 
