@@ -9,7 +9,7 @@ use std::time::Duration;
 /// Seems the library is quite big so I stepped back from using it.
 fn main() -> anyhow::Result<()> {
     let daemon = Daemon::new(
-        "ggml-org/gpt-oss-20b-GGUF:Q4_K_M".to_string(),
+        "ggml-org/gpt-oss-20b-GGUF".to_string(),
         vec![
             "--jinja".to_string(),
             "-ngl".to_string(),
