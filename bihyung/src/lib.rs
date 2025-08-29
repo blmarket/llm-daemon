@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use futures::TryFutureExt as _;
 use llm_daemon::{
-    self, llama_config_map, LlamaConfigs, LlamaDaemon as Daemon,
+    self, llama_config_map, Daemon3, LlamaConfigs, LlamaDaemon as Daemon,
     LlmConfig as _, LlmDaemon as _, ProxyConfig,
 };
 use pyo3::exceptions::PyTypeError;
@@ -60,6 +60,65 @@ impl DaemonHandle {
     pub fn endpoint(&self) -> String {
         self.endpoint.clone()
     }
+}
+
+#[pyclass]
+pub struct DaemonHandle3 {
+    daemon: Daemon3,
+    handle: Option<JoinHandle<PyResult<()>>>,
+    endpoint: String,
+}
+
+#[pymethods]
+impl DaemonHandle3 {
+    pub fn __enter__(&mut self) -> PyResult<()> {
+        self.daemon.fork_daemon().expect("failed to fork daemon");
+
+        if self.handle.is_some() {
+            panic!("cannot enter twice");
+        }
+        let runtime = get_runtime();
+        let daemon = self.daemon.clone();
+        self.handle = Some(runtime.spawn({
+            daemon
+                .heartbeat()
+                .map_err(|e| PyErr::new::<PyTypeError, _>(e.to_string()))
+        }));
+
+        Ok(())
+    }
+
+    pub fn __exit__(
+        &mut self,
+        _a: Option<PyObject>,
+        _b: Option<PyObject>,
+        _c: Option<PyObject>,
+    ) -> PyResult<bool> {
+        if self.handle.is_none() {
+            panic!("cannot exit twice");
+        }
+        self.handle.as_mut().unwrap().abort();
+        self.handle = None;
+        Ok(false)
+    }
+
+    pub fn endpoint(&self) -> String {
+        self.endpoint.clone()
+    }
+}
+
+#[pyfunction]
+pub fn daemon_from_hf(
+    hf_repo: String,
+    args: Vec<String>,
+) -> PyResult<DaemonHandle3> {
+    let daemon3 = Daemon3::new(hf_repo, args);
+    let endpoint = daemon3.config().endpoint();
+    Ok(DaemonHandle3 {
+        endpoint: endpoint.to_string(),
+        daemon: daemon3,
+        handle: None,
+    })
 }
 
 #[pyfunction]
@@ -139,7 +198,9 @@ fn bihyung(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<ProxyDaemon>()?;
     m.add_class::<Model>()?;
     m.add_class::<DaemonHandle>()?;
+    m.add_class::<DaemonHandle3>()?;
     m.add_function(wrap_pyfunction!(_daemon_from_model, m)?)?;
     m.add_function(wrap_pyfunction!(_daemon_from_gguf, m)?)?;
+    m.add_function(wrap_pyfunction!(daemon_from_hf, m)?)?;
     Ok(())
 }
