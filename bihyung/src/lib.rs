@@ -2,13 +2,12 @@ use std::path::PathBuf;
 
 use futures::TryFutureExt as _;
 use llm_daemon::{
-    self, llama_config_map, LlamaConfig, LlamaConfigs, LlamaDaemon as Daemon,
+    self, llama_config_map, LlamaConfigs, LlamaDaemon as Daemon,
     LlmConfig as _, LlmDaemon as _, ProxyConfig,
 };
 use pyo3::exceptions::PyTypeError;
 use pyo3::prelude::*;
-use pyo3::types::PyType;
-use pyo3_asyncio::tokio::get_runtime;
+use pyo3_async_runtimes::tokio::get_runtime;
 use tokio::task::JoinHandle;
 
 #[pyclass]
@@ -44,9 +43,9 @@ impl DaemonHandle {
         Ok(())
     }
 
-    pub fn __exit__<'a>(
+    pub fn __exit__(
         &mut self,
-        _a: Option<&'a PyType>,
+        _a: Option<PyObject>,
         _b: Option<PyObject>,
         _c: Option<PyObject>,
     ) -> PyResult<bool> {
@@ -136,7 +135,7 @@ impl ProxyDaemon {
 
 /// A Python module implemented in Rust.
 #[pymodule]
-fn bihyung(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
+fn bihyung(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<ProxyDaemon>()?;
     m.add_class::<Model>()?;
     m.add_class::<DaemonHandle>()?;

@@ -12,8 +12,8 @@ crate-type = ["cdylib"]
 
 [dependencies]
 llm-daemon = { version = "0.6.2-alpha.0", path = "../llm-daemon" }
-pyo3 = "0.20.0"
-pyo3-asyncio = { version = "0.20", features = ["tokio-runtime"] }
+pyo3 = "0.25"
+pyo3-async-runtimes = { version = "0.25", features = ["tokio-runtime"] }
 tokio = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = "0.3"
