@@ -58,3 +58,7 @@ required-features = ["llama-daemon"]
 [[example]]
 name = "qwen3-coder"
 required-features = ["llama-daemon", "cuda"]
+
+[[example]]
+name = "gpt-oss-20b"
+required-features = ["llama-daemon", "cuda"]
