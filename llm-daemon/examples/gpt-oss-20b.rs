@@ -3,7 +3,6 @@ use langchain_rust::language_models::options::CallOptions;
 use langchain_rust::llm::{OpenAI, OpenAIConfig};
 use langchain_rust::schemas::Message;
 use llm_daemon::{Daemon3 as Daemon, LlmConfig, LlmDaemon};
-use std::time::Duration;
 
 /// Even though this example uses langchain_rust, I don't support it for usages.
 /// Seems the library is quite big so I stepped back from using it.
@@ -36,6 +35,7 @@ fn main() -> anyhow::Result<()> {
             OpenAIConfig::new()
                 .with_api_base(daemon.config().endpoint().to_string()),
         );
+        let mut oai2 = oai.clone();
         let msg0 = Message::new_human_message(
             "Which model are you? What are your capabilities?",
         );
@@ -44,21 +44,11 @@ fn main() -> anyhow::Result<()> {
 
         let msg1 = Message::new_human_message("What is the sum of 17 and 23?");
         let msg2 = Message::new_ai_message("The sum of 17 and 23 is ");
-        let mut oai2 = oai.clone();
-        oai2.add_options(CallOptions {
-            max_tokens: Some(20),
-            stop_words: Some(vec![".".to_string()]),
-            ..Default::default()
-        });
         let resp2 = oai2.generate(&[msg1, msg2]).await?;
         dbg!(&resp2.generation);
         assert!(resp2.generation.to_string().contains("40"));
 
         dbg!(daemon.config().endpoint().to_string());
-
-        loop {
-            tokio::time::sleep(Duration::from_secs(1000)).await;
-        }
 
         Ok(())
     })
