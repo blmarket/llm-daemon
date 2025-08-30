@@ -1,3 +1,15 @@
+## Changes on 0.6.3 - Daemon logging had a bug
+
+I found the log files are not being updated until a point the new log contents
+accumulate until a point.
+
+It was my bad that I chose the wrong option to open a log file. Either it should
+enable append or truncate, but chose none of them was a bad decision.
+
+Learned it in a hard way...
+
+---
+
 ## Let's create an example where proxy is working as expected
 
 At this point it's hard to tell whether the proxy is really worth. Would be
