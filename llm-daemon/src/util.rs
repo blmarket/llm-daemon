@@ -25,7 +25,7 @@ pub trait LlmDaemonCommand {
 
     fn fork_daemon(&self) -> anyhow::Result<()> {
         let mut open_opts = OpenOptions::new();
-        open_opts.write(true).create(true).truncate(false);
+        open_opts.write(true).create(true).truncate(true);
         let stdout = open_opts
             .open(self.stdout())
             .expect("failed to open stdout file");
