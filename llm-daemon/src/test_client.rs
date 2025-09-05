@@ -30,6 +30,7 @@ enum LlmResponse {
     LlamaCpp(Completion),
 }
 
+#[deprecated]
 pub struct Generator {
     endpoint: Url,
     model: String,

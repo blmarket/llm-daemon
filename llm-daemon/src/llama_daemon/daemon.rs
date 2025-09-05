@@ -12,6 +12,7 @@ use crate::util::LlmDaemonCommand;
 use crate::LlmDaemon;
 
 #[derive(Debug, Clone)]
+#[deprecated]
 pub struct LlamaConfig {
     pub model_path: PathBuf,
     pub pid_file: PathBuf,
@@ -34,12 +35,14 @@ impl LlmConfig for LlamaConfig {
 }
 
 #[derive(PartialEq, Eq, Hash)]
+#[deprecated]
 pub enum LlamaConfigs {
     Llama3,
     Phi3,
     Gemma2b,
 }
 
+#[deprecated]
 pub fn llama_config_map() -> &'static HashMap<LlamaConfigs, LlamaConfig> {
     static CONFIG_MAP: OnceLock<HashMap<LlamaConfigs, LlamaConfig>> =
         OnceLock::new();
@@ -84,6 +87,7 @@ pub fn llama_config_map() -> &'static HashMap<LlamaConfigs, LlamaConfig> {
 }
 
 #[derive(Clone, Debug)]
+#[deprecated]
 pub struct Daemon {
     server_path: PathBuf,
     config: LlamaConfig,
