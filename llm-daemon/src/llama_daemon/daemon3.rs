@@ -32,6 +32,14 @@ impl LlmConfig for LlamaConfig {
 }
 
 #[derive(Clone, Debug)]
+pub struct Daemon3Params {
+    pub hf_repo: String,
+    pub args: Option<Vec<String>>,
+    pub port: Option<u16>,
+    pub server_binary: Option<PathBuf>,
+}
+
+#[derive(Clone, Debug)]
 pub struct Daemon3 {
     server_path: PathBuf,
     hf_repo: String,
@@ -59,14 +67,16 @@ fn infer_server_path() -> PathBuf {
     server_path
 }
 
-impl Daemon3 {
-    pub fn new(hf_repo: String, custom_args: Vec<String>) -> Self {
+impl From<Daemon3Params> for Daemon3 {
+    fn from(params: Daemon3Params) -> Self {
         let mut hasher = std::hash::DefaultHasher::new();
-        let _ = &hf_repo.hash(&mut hasher);
-        let port = 9000u16 + (hasher.finish() & 0xff) as u16;
+        let _ = &params.hf_repo.hash(&mut hasher);
+        let port = params.port.unwrap_or_else(|| 9000u16 + (hasher.finish() & 0xff) as u16);
+        let server_path = params.server_binary.unwrap_or_else(infer_server_path);
+        let custom_args = params.args.unwrap_or_default();
         Self {
-            server_path: infer_server_path(),
-            hf_repo,
+            server_path,
+            hf_repo: params.hf_repo,
             config: LlamaConfig {
                 port,
                 pid_file: PathBuf::from(format!("/tmp/llm-{}.pid", port)),
@@ -77,24 +87,25 @@ impl Daemon3 {
             custom_args,
         }
     }
+}
 
+impl Daemon3 {
+    pub fn new(params: Daemon3Params) -> Self {
+        params.into()
+    }
+
+    #[deprecated(note = "Use Daemon3::new with Daemon3Params instead")]
     pub fn with_port(
         hf_repo: String,
         port: u16,
         custom_args: Vec<String>,
     ) -> Self {
-        Self {
-            server_path: infer_server_path(),
+        Daemon3Params {
             hf_repo,
-            config: LlamaConfig {
-                port,
-                pid_file: PathBuf::from(format!("/tmp/llm-{}.pid", port)),
-                stdout: PathBuf::from(format!("/tmp/llm-{}.stdout", port)),
-                stderr: PathBuf::from(format!("/tmp/llm-{}.stderr", port)),
-                sock_file: PathBuf::from(format!("/tmp/llm-{}.sock", port)),
-            },
-            custom_args,
-        }
+            args: Some(custom_args),
+            port: Some(port),
+            server_binary: None,
+        }.into()
     }
 }
 
@@ -168,10 +179,12 @@ mod tests {
 
     #[test]
     fn launch_daemon() -> anyhow::Result<()> {
-        let daemon = Daemon3::new(
-            "microsoft/Phi-3-mini-4k-instruct-gguf".to_string(),
-            vec!["-ngl".to_string(), "99".to_string(), "-fa".to_string()],
-        );
+        let daemon = Daemon3::new(Daemon3Params {
+            hf_repo: "microsoft/Phi-3-mini-4k-instruct-gguf".to_string(),
+            args: Some(vec!["-ngl".to_string(), "99".to_string(), "-fa".to_string()]),
+            port: None,
+            server_binary: None,
+        });
         daemon.fork_daemon()?;
         Ok(())
     }
