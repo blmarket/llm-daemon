@@ -4,7 +4,7 @@ use std::path::PathBuf;
 
 use serde::{Deserialize, Serialize};
 use tokio::process::Command;
-use tracing::debug;
+use tracing::{debug, info};
 
 use crate::daemon_trait::LlmConfig;
 use crate::util::LlmDaemonCommand;
@@ -114,6 +114,7 @@ impl LlmDaemonCommand for Daemon3 {
 
     fn spawn(&self) -> std::io::Result<(tokio::process::Child, ())> {
         let daemon = self;
+        info!("Server path: {:?}", &daemon.server_path);
         let mut cmd = Command::new(&daemon.server_path);
 
         // Add default arguments
