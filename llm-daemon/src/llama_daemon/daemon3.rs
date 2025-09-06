@@ -175,7 +175,7 @@ impl LlmDaemon for Daemon3 {
 
 #[cfg(test)]
 mod tests {
-    use super::Daemon3;
+    use super::{Daemon3, Daemon3Params};
     use crate::LlmDaemon;
 
     #[test]
