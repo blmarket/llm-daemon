@@ -3,7 +3,7 @@
 authors = ["blmarket <blmarket@gmail.com>"]
 edition = "2021"
 name = "llm_daemon"
-version = "0.1.0"
+version = "0.7.0"
 
 [lib]
 crate-type = ["cdylib"]
