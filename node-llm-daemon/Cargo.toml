@@ -1,6 +1,5 @@
-
 [package]
-authors = ["LongYinan <lynweklm@gmail.com>"]
+authors = ["blmarket <blmarket@gmail.com>"]
 edition = "2021"
 name = "llm_daemon"
 version = "0.1.0"
