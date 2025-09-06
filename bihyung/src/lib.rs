@@ -112,7 +112,12 @@ pub fn daemon_from_hf(
     hf_repo: String,
     args: Vec<String>,
 ) -> PyResult<DaemonHandle3> {
-    let daemon3 = Daemon3::new(hf_repo, args);
+    let daemon3 = Daemon3::new(llm_daemon::Daemon3Params {
+        hf_repo,
+        args: Some(args),
+        port: None,
+        server_binary: None,
+    });
     let endpoint = daemon3.config().endpoint();
     Ok(DaemonHandle3 {
         endpoint: endpoint.to_string(),
