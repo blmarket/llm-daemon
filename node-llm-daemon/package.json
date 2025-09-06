@@ -99,5 +99,8 @@
     "singleQuote": true,
     "arrowParens": "always"
   },
-  "packageManager": "yarn@4.9.4"
+  "packageManager": "yarn@4.9.4",
+  "optionalDependencies": {
+    "@blmarket/llm-daemon-linux-x64-gnu": "1.0.0"
+  }
 }
