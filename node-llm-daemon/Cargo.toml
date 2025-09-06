@@ -1,3 +1,4 @@
+
 [package]
 authors = ["blmarket <blmarket@gmail.com>"]
 edition = "2021"
@@ -10,7 +11,9 @@ crate-type = ["cdylib"]
 [dependencies]
 napi = "3.0.0"
 napi-derive = "3.0.0"
-llm-daemon = { path = "../llm-daemon" }
+
+[dependencies.llm-daemon]
+path = "../llm-daemon"
 
 [build-dependencies]
 napi-build = "2"

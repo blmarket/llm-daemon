@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = [ "llm-daemon", "bihyung", "llama-cpp-low", "node-llm-daemon", ]
+members = [ "llm-daemon", "bihyung", "llama-cpp-low", "node-llm-daemon", "neon-llm-daemon", ]
 default-members = [ "llm-daemon" ]
 
 [workspace.package]
