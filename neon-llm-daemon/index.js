@@ -1,5 +1,8 @@
 const { startDaemon } = require("./index.node");
 
-console.log(require.resolve("./server"));
+const serverPath = require.resolve("./server");
 
-exports.startDaemon = startDaemon;
+exports.startDaemon = (hf_repo, args) => {
+    console.log(serverPath);
+    return startDaemon(hf_repo, args, serverPath);
+}
