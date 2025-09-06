@@ -1,6 +1,6 @@
 {
   "name": "@blmarket/llm-daemon",
-  "version": "0.7.0",
+  "version": "0.7.0-alpha0",
   "description": "Launch LLM daemon",
   "main": "index.node",
   "scripts": {
