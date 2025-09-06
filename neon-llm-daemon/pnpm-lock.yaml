@@ -4,9 +4,16 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  '@blmarket/llm-daemon': 'link:'
+
 importers:
 
   .:
+    dependencies:
+      '@blmarket/llm-daemon':
+        specifier: 'link:'
+        version: 'link:'
     devDependencies:
       '@neon-rs/cli':
         specifier: 0.1.82

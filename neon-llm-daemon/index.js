@@ -1,5 +1,5 @@
 const { startDaemon } = require("./index.node");
 
-console.log(require.resolve());
+console.log(require.resolve("./server"));
 
-export { startDaemon };
+exports.startDaemon = startDaemon;

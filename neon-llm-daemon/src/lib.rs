@@ -1,12 +1,15 @@
+use std::path::PathBuf;
+
 use llm_daemon::{Daemon3, Daemon3Params, LlmDaemon as _};
+use neon::types::{JsArray, JsValue};
 
 #[neon::export]
-fn start_daemon(hf_repo: String) {
+fn start_daemon(server_binary: String, hf_repo: String) {
     let daemon = Daemon3::from(Daemon3Params {
         hf_repo,
         args: None, // Some(args),
         port: None,
-        server_binary: Some(std::env::current_dir().unwrap().join("server")),
+        server_binary: Some(PathBuf::from(server_binary)),
     });
     let _ = daemon.fork_daemon();
 }

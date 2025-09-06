@@ -2,7 +2,8 @@
   "name": "@blmarket/llm-daemon",
   "version": "0.7.0-alpha0",
   "description": "Launch LLM daemon",
-  "main": "index.node",
+  "main": "index.js",
+  "type": "commonjs",
   "scripts": {
     "test": "cargo test",
     "cargo-build": "cargo build --message-format=json-render-diagnostics > cargo.log",
@@ -15,8 +16,10 @@
   },
   "author": "",
   "license": "GPL-3.0-only",
-  "type": "module",
   "devDependencies": {
     "@neon-rs/cli": "0.1.82"
+  },
+  "dependencies": {
+    "@blmarket/llm-daemon": "link:"
   }
 }
