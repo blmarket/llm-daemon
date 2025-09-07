@@ -1,3 +1,13 @@
+## Changes on 0.7.0 - javascript runtime support
+
+https://www.npmjs.com/package/@blmarket/llm-daemon
+
+Note that version is not central - had to use 0.7.1 for npm version, later we will consolidate this.
+
+Also deprecated bunch of things.
+
+---
+
 ## Changes on 0.6.3 - Daemon logging had a bug
 
 I found the log files are not being updated until a point the new log contents
