@@ -19,6 +19,11 @@ fn main() {
     if env::var("CARGO_CFG_TARGET_OS").unwrap() != "macos" {
         if cuda == "1" {
             cmake.configure_arg("-DGGML_CUDA=ON");
+            if let Ok(host) = env::var("CUDAHOSTCXX") {
+                cmake.configure_arg(format!("-DCMAKE_CUDA_HOST_COMPILER={host}"));
+            } else if std::path::Path::new("/usr/bin/g++-14").exists() {
+                cmake.configure_arg("-DCMAKE_CUDA_HOST_COMPILER=/usr/bin/g++-14");
+            }
         }
     } else {
         cmake.configure_arg("-DGGML_METAL_EMBED_LIBRARY=ON");
