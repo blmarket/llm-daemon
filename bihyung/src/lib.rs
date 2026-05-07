@@ -110,13 +110,14 @@ impl DaemonHandle3 {
 #[pyfunction]
 pub fn daemon_from_hf(
     hf_repo: String,
+    server_path: String,
     args: Vec<String>,
 ) -> PyResult<DaemonHandle3> {
     let daemon3 = Daemon3::new(llm_daemon::Daemon3Params {
         hf_repo,
         args: Some(args),
         port: None,
-        server_binary: None,
+        server_binary: Some(server_path.into()),
     });
     let endpoint = daemon3.config().endpoint();
     Ok(DaemonHandle3 {

@@ -10,6 +10,9 @@ license = "GPL-3.0-only"
 name = "bihyung"
 crate-type = ["cdylib"]
 
+[features]
+cuda = ["llm-daemon/cuda"]
+
 [dependencies]
 llm-daemon = { path = "../llm-daemon" }
 pyo3 = "0.25"

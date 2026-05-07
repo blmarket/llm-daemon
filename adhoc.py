@@ -19,7 +19,15 @@ maturin_import_hook.install()
 
 #%%
 import requests
-from bihyung import Model, daemon_from_model, daemon_from_gguf
+from bihyung import Model, daemon_from_model, daemon_from_gguf, daemon_from_hf, _server_path
+
+#%%
+inner = daemon_from_hf("unsloth/Qwen3.6-27B-GGUF:Qwen3.6-27B-Q4_K_M", _server_path, 
+                       [ "-ngl", "99"])
+inner.__enter__()
+
+#%%
+inner
 
 #%%
 with daemon_from_model(Model.Gemma2b) as inner:
