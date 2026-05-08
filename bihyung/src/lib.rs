@@ -1,3 +1,5 @@
+#![allow(deprecated)]
+
 use std::path::PathBuf;
 
 use futures::TryFutureExt as _;
@@ -17,6 +19,7 @@ pub enum Model {
     Gemma2b,
 }
 
+#[deprecated = "use DaemonHandle3 / daemon_from_hf instead"]
 #[pyclass]
 pub struct DaemonHandle {
     daemon: Daemon,
@@ -127,6 +130,7 @@ pub fn daemon_from_hf(
     })
 }
 
+#[deprecated = "use daemon_from_hf instead"]
 #[pyfunction]
 pub fn _daemon_from_model<'a>(
     model: &'a Model,
@@ -146,6 +150,7 @@ pub fn _daemon_from_model<'a>(
     })
 }
 
+#[deprecated = "use daemon_from_hf instead"]
 #[pyfunction]
 pub fn _daemon_from_gguf<'a>(
     model_path: String,
@@ -160,6 +165,7 @@ pub fn _daemon_from_gguf<'a>(
     })
 }
 
+#[deprecated = "use daemon_from_hf with a proxy layer instead"]
 #[pyclass]
 pub struct ProxyDaemon {
     inner: llm_daemon::Proxy<Daemon>,
