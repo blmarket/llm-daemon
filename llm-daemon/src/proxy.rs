@@ -13,7 +13,6 @@ use hyper::{Response, StatusCode};
 use hyper_util::client::legacy::connect::HttpConnector;
 use hyper_util::client::legacy::Client;
 use hyper_util::rt::TokioExecutor;
-use serde::{Deserialize, Serialize};
 use serde_json::json;
 use tokio::net::TcpListener;
 use tokio::sync::Semaphore;
@@ -63,11 +62,6 @@ impl<D: LlmDaemon + Debug> Proxy<D> {
     pub fn new(config: ProxyConfig, inner: D) -> Self {
         Self { config, inner }
     }
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-struct Completion {
-    content: String,
 }
 
 impl<D: LlmDaemon + Debug> LlmDaemon for Proxy<D> {

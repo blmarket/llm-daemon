@@ -4,7 +4,6 @@ use std::hash::{Hash, Hasher as _};
 use std::path::PathBuf;
 use std::sync::OnceLock;
 
-use serde::{Deserialize, Serialize};
 use tokio::process::Command;
 
 use crate::daemon_trait::LlmConfig;
@@ -91,11 +90,6 @@ pub fn llama_config_map() -> &'static HashMap<LlamaConfigs, LlamaConfig> {
 pub struct Daemon {
     server_path: PathBuf,
     config: LlamaConfig,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-struct Completion {
-    content: String,
 }
 
 fn infer_server_path() -> PathBuf {

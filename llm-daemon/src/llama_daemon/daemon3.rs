@@ -2,7 +2,6 @@ use std::borrow::Borrow;
 use std::hash::{Hash, Hasher as _};
 use std::path::PathBuf;
 
-use serde::{Deserialize, Serialize};
 use tokio::process::Command;
 use tracing::{debug, info};
 
@@ -45,11 +44,6 @@ pub struct Daemon3 {
     hf_repo: String,
     config: LlamaConfig,
     custom_args: Vec<String>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-struct Completion {
-    content: String,
 }
 
 fn infer_server_path() -> PathBuf {
